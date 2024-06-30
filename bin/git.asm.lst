@@ -1,0 +1,1235 @@
+------- FILE git.asm LEVEL 1 PASS 2
+      1  10000 ????						;
+      2  10000 ????						;
+      3  10000 ????						; Diamond Craze (chapter 9 of Programming Games for Atari 2600)
+      4  10000 ????						;
+      5  10000 ????						; by Oscar Toledo G.
+      6  10000 ????						; https://nanochess.org/
+      7  10000 ????						;
+      8  10000 ????						; Creation date: Jul/01/2022.
+      9  10000 ????						; Revision date: Jul/03/2022. Completed.
+     10  10000 ????						; Revision date: Nov/13/2022. Added NTSC definition to choose NTSC/PAL.
+     11  10000 ????						;
+     12  10000 ????
+     13  10000 ????				       PROCESSOR	6502
+------- FILE vcs.h LEVEL 2 PASS 2
+      0  10000 ????				       INCLUDE	"vcs.h"
+      1  10000 ????						; VCS.H
+      2  10000 ????						; Version 1.05, 13/November/2003
+      3  10000 ????
+      4  10000 ????		00 69	    VERSION_VCS =	105
+      5  10000 ????
+      6  10000 ????						; THIS IS A PRELIMINARY RELEASE OF *THE* "STANDARD" VCS.H
+      7  10000 ????						; THIS FILE IS EXPLICITLY SUPPORTED AS A DASM-PREFERRED COMPANION FILE
+      8  10000 ????						; PLEASE DO *NOT* REDISTRIBUTE THIS FILE!
+      9  10000 ????						;
+     10  10000 ????						; This file defines hardware registers and memory mapping for the
+     11  10000 ????						; Atari 2600. It is distributed as a companion machine-specific support package
+     12  10000 ????						; for the DASM compiler. Updates to this file, DASM, and associated tools are
+     13  10000 ????						; available at at http://www.atari2600.org/dasm
+     14  10000 ????						;
+     15  10000 ????						; Many thanks to the original author(s) of this file, and to everyone who has
+     16  10000 ????						; contributed to understanding the Atari 2600.  If you take issue with the
+     17  10000 ????						; contents, or naming of registers, please write to me (atari2600@taswegian.com)
+     18  10000 ????						; with your views.  Please contribute, if you think you can improve this
+     19  10000 ????						; file!
+     20  10000 ????						;
+     21  10000 ????						; Latest Revisions...
+     22  10000 ????						; 1.05  13/NOV/2003	  - Correction to 1.04 - now functions as requested by MR.
+     23  10000 ????						;			  - Added VERSION_VCS equate (which will reflect 100x version #)
+     24  10000 ????						;			    This will allow conditional code to verify VCS.H being
+     25  10000 ????						;			    used for code assembly.
+     26  10000 ????						; 1.04  12/NOV/2003	 Added TIA_BASE_WRITE_ADDRESS and TIA_BASE_READ_ADDRESS for
+     27  10000 ????						;			 convenient disassembly/reassembly compatibility for hardware
+     28  10000 ????						;			 mirrored reading/writing differences.	This is more a 
+     29  10000 ????						;			 readability issue, and binary compatibility with disassembled
+     30  10000 ????						;			 and reassembled sources.  Per Manuel Rotschkar's suggestion.
+     31  10000 ????						; 1.03  12/MAY/2003	 Added SEG segment at end of file to fix old-code compatibility
+     32  10000 ????						;			 which was broken by the use of segments in this file, as
+     33  10000 ????						;			 reported by Manuel Polik on [stella] 11/MAY/2003
+     34  10000 ????						; 1.02  22/MAR/2003	 Added TIMINT($285)
+     35  10000 ????						; 1.01				Constant offset added to allow use for 3F-style bankswitching
+     36  10000 ????						;						 - define TIA_BASE_ADDRESS as $40 for Tigervision carts, otherwise
+     37  10000 ????						;						   it is safe to leave it undefined, and the base address will
+     38  10000 ????						;						   be set to 0.  Thanks to Eckhard Stolberg for the suggestion.
+     39  10000 ????						;			    Note, may use -DLABEL=EXPRESSION to define TIA_BASE_ADDRESS
+     40  10000 ????						;			  - register definitions are now generated through assignment
+     41  10000 ????						;			    in uninitialised segments.	This allows a changeable base
+     42  10000 ????						;			    address architecture.
+     43  10000 ????						; 1.0	22/MAR/2003		Initial release
+     44  10000 ????
+     45  10000 ????
+     46  10000 ????						;-------------------------------------------------------------------------------
+     47  10000 ????
+     48  10000 ????						; TIA_BASE_ADDRESS
+     49  10000 ????						; The TIA_BASE_ADDRESS defines the base address of access to TIA registers.
+     50  10000 ????						; Normally 0, the base address should (externally, before including this file)
+     51  10000 ????						; be set to $40 when creating 3F-bankswitched (and other?) cartridges.
+     52  10000 ????						; The reason is that this bankswitching scheme treats any access to locations
+     53  10000 ????						; < $40 as a bankswitch.
+     54  10000 ????
+     55  10000 ????			   -	       IFNCONST	TIA_BASE_ADDRESS
+     56  10000 ????			   -TIA_BASE_ADDRESS =	0
+     57  10000 ????				       ENDIF
+     58  10000 ????
+     59  10000 ????						; Note: The address may be defined on the command-line using the -D switch, eg:
+     60  10000 ????						; dasm.exe code.asm -DTIA_BASE_ADDRESS=$40 -f3 -v5 -ocode.bin
+     61  10000 ????						; *OR* by declaring the label before including this file, eg:
+     62  10000 ????						; TIA_BASE_ADDRESS = $40
+     63  10000 ????						;   include "vcs.h"
+     64  10000 ????
+     65  10000 ????						; Alternate read/write address capability - allows for some disassembly compatibility
+     66  10000 ????						; usage ; to allow reassembly to binary perfect copies).  This is essentially catering
+     67  10000 ????						; for the mirrored ROM hardware registers.
+     68  10000 ????
+     69  10000 ????						; Usage: As per above, define the TIA_BASE_READ_ADDRESS and/or TIA_BASE_WRITE_ADDRESS
+     70  10000 ????						; using the -D command-line switch, as required.  If the addresses are not defined, 
+     71  10000 ????						; they defaut to the TIA_BASE_ADDRESS.
+     72  10000 ????
+     73  10000 ????			   -	       IFNCONST	TIA_BASE_READ_ADDRESS
+     74  10000 ????			   -TIA_BASE_READ_ADDRESS =	TIA_BASE_ADDRESS
+     75  10000 ????				       ENDIF
+     76  10000 ????
+     77  10000 ????			   -	       IFNCONST	TIA_BASE_WRITE_ADDRESS
+     78  10000 ????			   -TIA_BASE_WRITE_ADDRESS =	TIA_BASE_ADDRESS
+     79  10000 ????				       ENDIF
+     80  10000 ????
+     81  10000 ????						;-------------------------------------------------------------------------------
+     82  10000 ????
+     83 U002d ????				      SEG.U	TIA_REGISTERS_WRITE
+     84 U0000					      ORG	TIA_BASE_WRITE_ADDRESS
+     85 U0000
+     86 U0000							; DO NOT CHANGE THE RELATIVE ORDERING OF REGISTERS!
+     87 U0000
+     88 U0000		       00	   VSYNC      ds	1	; $00	 0000 00x0   Vertical Sync Set-Clear
+     89 U0001		       00	   VBLANK     ds	1	; $01	 xx00 00x0   Vertical Blank Set-Clear
+     90 U0002		       00	   WSYNC      ds	1	; $02	 ---- ----   Wait for Horizontal Blank
+     91 U0003		       00	   RSYNC      ds	1	; $03	 ---- ----   Reset Horizontal Sync Counter
+     92 U0004		       00	   NUSIZ0     ds	1	; $04	 00xx 0xxx   Number-Size player/missle 0
+     93 U0005		       00	   NUSIZ1     ds	1	; $05	 00xx 0xxx   Number-Size player/missle 1
+     94 U0006		       00	   COLUP0     ds	1	; $06	 xxxx xxx0   Color-Luminance Player 0
+     95 U0007		       00	   COLUP1     ds	1	; $07	 xxxx xxx0   Color-Luminance Player 1
+     96 U0008		       00	   COLUPF     ds	1	; $08	 xxxx xxx0   Color-Luminance Playfield
+     97 U0009		       00	   COLUBK     ds	1	; $09	 xxxx xxx0   Color-Luminance Background
+     98 U000a		       00	   CTRLPF     ds	1	; $0A	 00xx 0xxx   Control Playfield, Ball, Collisions
+     99 U000b		       00	   REFP0      ds	1	; $0B	 0000 x000   Reflection Player 0
+    100 U000c		       00	   REFP1      ds	1	; $0C	 0000 x000   Reflection Player 1
+    101 U000d		       00	   PF0	      ds	1	; $0D	 xxxx 0000   Playfield Register Byte 0
+    102 U000e		       00	   PF1	      ds	1	; $0E	 xxxx xxxx   Playfield Register Byte 1
+    103 U000f		       00	   PF2	      ds	1	; $0F	 xxxx xxxx   Playfield Register Byte 2
+    104 U0010		       00	   RESP0      ds	1	; $10	 ---- ----   Reset Player 0
+    105 U0011		       00	   RESP1      ds	1	; $11	 ---- ----   Reset Player 1
+    106 U0012		       00	   RESM0      ds	1	; $12	 ---- ----   Reset Missle 0
+    107 U0013		       00	   RESM1      ds	1	; $13	 ---- ----   Reset Missle 1
+    108 U0014		       00	   RESBL      ds	1	; $14	 ---- ----   Reset Ball
+    109 U0015		       00	   AUDC0      ds	1	; $15	 0000 xxxx   Audio Control 0
+    110 U0016		       00	   AUDC1      ds	1	; $16	 0000 xxxx   Audio Control 1
+    111 U0017		       00	   AUDF0      ds	1	; $17	 000x xxxx   Audio Frequency 0
+    112 U0018		       00	   AUDF1      ds	1	; $18	 000x xxxx   Audio Frequency 1
+    113 U0019		       00	   AUDV0      ds	1	; $19	 0000 xxxx   Audio Volume 0
+    114 U001a		       00	   AUDV1      ds	1	; $1A	 0000 xxxx   Audio Volume 1
+    115 U001b		       00	   GRP0       ds	1	; $1B	 xxxx xxxx   Graphics Register Player 0
+    116 U001c		       00	   GRP1       ds	1	; $1C	 xxxx xxxx   Graphics Register Player 1
+    117 U001d		       00	   ENAM0      ds	1	; $1D	 0000 00x0   Graphics Enable Missle 0
+    118 U001e		       00	   ENAM1      ds	1	; $1E	 0000 00x0   Graphics Enable Missle 1
+    119 U001f		       00	   ENABL      ds	1	; $1F	 0000 00x0   Graphics Enable Ball
+    120 U0020		       00	   HMP0       ds	1	; $20	 xxxx 0000   Horizontal Motion Player 0
+    121 U0021		       00	   HMP1       ds	1	; $21	 xxxx 0000   Horizontal Motion Player 1
+    122 U0022		       00	   HMM0       ds	1	; $22	 xxxx 0000   Horizontal Motion Missle 0
+    123 U0023		       00	   HMM1       ds	1	; $23	 xxxx 0000   Horizontal Motion Missle 1
+    124 U0024		       00	   HMBL       ds	1	; $24	 xxxx 0000   Horizontal Motion Ball
+    125 U0025		       00	   VDELP0     ds	1	; $25	 0000 000x   Vertical Delay Player 0
+    126 U0026		       00	   VDELP1     ds	1	; $26	 0000 000x   Vertical Delay Player 1
+    127 U0027		       00	   VDELBL     ds	1	; $27	 0000 000x   Vertical Delay Ball
+    128 U0028		       00	   RESMP0     ds	1	; $28	 0000 00x0   Reset Missle 0 to Player 0
+    129 U0029		       00	   RESMP1     ds	1	; $29	 0000 00x0   Reset Missle 1 to Player 1
+    130 U002a		       00	   HMOVE      ds	1	; $2A	 ---- ----   Apply Horizontal Motion
+    131 U002b		       00	   HMCLR      ds	1	; $2B	 ---- ----   Clear Horizontal Move Registers
+    132 U002c		       00	   CXCLR      ds	1	; $2C	 ---- ----   Clear Collision Latches
+    133 U002d
+    134 U002d							;-------------------------------------------------------------------------------
+    135 U002d
+    136 U000e ????				      SEG.U	TIA_REGISTERS_READ
+    137 U0000					      ORG	TIA_BASE_READ_ADDRESS
+    138 U0000
+    139 U0000							;											bit 7	 bit 6
+    140 U0000		       00	   CXM0P      ds	1	; $00	     xx00 0000	     Read Collision  M0-P1   M0-P0
+    141 U0001		       00	   CXM1P      ds	1	; $01	     xx00 0000			     M1-P0   M1-P1
+    142 U0002		       00	   CXP0FB     ds	1	; $02	     xx00 0000			     P0-PF   P0-BL
+    143 U0003		       00	   CXP1FB     ds	1	; $03	     xx00 0000			     P1-PF   P1-BL
+    144 U0004		       00	   CXM0FB     ds	1	; $04	     xx00 0000			     M0-PF   M0-BL
+    145 U0005		       00	   CXM1FB     ds	1	; $05	     xx00 0000			     M1-PF   M1-BL
+    146 U0006		       00	   CXBLPF     ds	1	; $06	     x000 0000			     BL-PF   -----
+    147 U0007		       00	   CXPPMM     ds	1	; $07	     xx00 0000			     P0-P1   M0-M1
+    148 U0008		       00	   INPT0      ds	1	; $08	     x000 0000	     Read Pot Port 0
+    149 U0009		       00	   INPT1      ds	1	; $09	     x000 0000	     Read Pot Port 1
+    150 U000a		       00	   INPT2      ds	1	; $0A	     x000 0000	     Read Pot Port 2
+    151 U000b		       00	   INPT3      ds	1	; $0B	     x000 0000	     Read Pot Port 3
+    152 U000c		       00	   INPT4      ds	1	; $0C		x000 0000	 Read Input (Trigger) 0
+    153 U000d		       00	   INPT5      ds	1	; $0D		x000 0000	 Read Input (Trigger) 1
+    154 U000e
+    155 U000e							;-------------------------------------------------------------------------------
+    156 U000e
+    157 U0298 ????				      SEG.U	RIOT
+    158 U0280					      ORG	$280
+    159 U0280
+    160 U0280							; RIOT MEMORY MAP
+    161 U0280
+    162 U0280		       00	   SWCHA      ds	1	; $280      Port A data register for joysticks:
+    163 U0281							;			Bits 4-7 for player 1.  Bits 0-3 for player 2.
+    164 U0281
+    165 U0281		       00	   SWACNT     ds	1	; $281      Port A data direction register (DDR)
+    166 U0282		       00	   SWCHB      ds	1	; $282		Port B data (console switches)
+    167 U0283		       00	   SWBCNT     ds	1	; $283      Port B DDR
+    168 U0284		       00	   INTIM      ds	1	; $284		Timer output
+    169 U0285
+    170 U0285		       00	   TIMINT     ds	1	; $285
+    171 U0286
+    172 U0286							; Unused/undefined registers ($285-$294)
+    173 U0286
+    174 U0286		       00		      ds	1	; $286
+    175 U0287		       00		      ds	1	; $287
+    176 U0288		       00		      ds	1	; $288
+    177 U0289		       00		      ds	1	; $289
+    178 U028a		       00		      ds	1	; $28A
+    179 U028b		       00		      ds	1	; $28B
+    180 U028c		       00		      ds	1	; $28C
+    181 U028d		       00		      ds	1	; $28D
+    182 U028e		       00		      ds	1	; $28E
+    183 U028f		       00		      ds	1	; $28F
+    184 U0290		       00		      ds	1	; $290
+    185 U0291		       00		      ds	1	; $291
+    186 U0292		       00		      ds	1	; $292
+    187 U0293		       00		      ds	1	; $293
+    188 U0294
+    189 U0294		       00	   TIM1T      ds	1	; $294		set 1 clock interval
+    190 U0295		       00	   TIM8T      ds	1	; $295      set 8 clock interval
+    191 U0296		       00	   TIM64T     ds	1	; $296      set 64 clock interval
+    192 U0297		       00	   T1024T     ds	1	; $297      set 1024 clock interval
+    193 U0298
+    194 U0298							;-------------------------------------------------------------------------------
+    195 U0298							; The following required for back-compatibility with code which does not use
+    196 U0298							; segments.
+    197 U0298
+    198  10000 ????				       SEG
+    199  10000 ????
+    200  10000 ????						; EOF
+------- FILE git.asm
+     15  10000 ????
+     16  10000 ????		00 01	    NTSC       =	1	; Define to 1 for NTSC, 0 for PAL
+     17  10000 ????
+     18  10000 ????		00 80	    FRAME      =	$80	; Displayed frames count.
+     19  10000 ????		00 81	    NEXTSPR    =	$81	; Next sprite to show.
+     20  10000 ????		00 82	    MODE       =	$82	; Game mode.
+     21  10000 ????		00 83	    LIVES      =	$83	; Total lives remaining.
+     22  10000 ????		00 84	    TEMP1      =	$84	; Temporary variable 1.
+     23  10000 ????		00 85	    TEMP2      =	$85	; Temporary variable 2.
+     24  10000 ????		00 86	    TEMP3      =	$86	; Temporary variable 3.
+     25  10000 ????		00 87	    RAND       =	$87	; Pseudorandom number.
+     26  10000 ????		00 88	    SPRITE0    =	$88	; Pointer to bitmap for sprite 0.
+     27  10000 ????		00 90	    SPRITE1    =	$90	; Pointer to bitmap for sprite 1.
+     28  10000 ????		00 98	    YPOS0      =	$98	; Y-position for sprite 0.
+     29  10000 ????		00 99	    YPOS1      =	$99	; Y-position for sprite 1.
+     30  10000 ????		00 9a	    XPOS       =	$9a	; X-position of things.
+     31  10000 ????		00 9f	    YPOS       =	$9f	; Y-position of things.
+     32  10000 ????		00 a4	    SPRITE     =	$a4	; Sprite number of things.
+     33  10000 ????		00 a9	    DIR        =	$a9	; Direction/state of things.
+     34  10000 ????		00 ae	    SCORE1     =	$ae	; First digit of score.
+     35  10000 ????		00 af	    SCORE2     =	$af	; Second digit of score.
+     36  10000 ????		00 b0	    ROW        =	$b0	; Maze row.
+     37  10000 ????		00 b1	    SOUND      =	$b1	; Sound effect duration.
+     38  10000 ????
+     39  f000					      ORG	$F000
+     40  f000				   START
+     41  f000		       78		      SEI		; Disable interrupts.
+     42  f001		       d8		      CLD		; Clear decimal mode.
+     43  f002		       a2 ff		      LDX	#$FF	; X = $ff
+     44  f004		       9a		      TXS		; S = $ff
+     45  f005		       a9 00		      LDA	#$00	; A = $00
+     46  f007				   CLEAR
+     47  f007		       95 00		      STA	0,X	; Clear memory.
+     48  f009		       ca		      DEX		; Decrement X.
+     49  f00a		       d0 fb		      BNE	CLEAR	; Branch if not zero.
+     50  f00c
+     51  f00c		       a9 00		      LDA	#$00	; Configure SWCHA as input
+     52  f00e		       8d 81 02 	      STA	SWACNT
+     53  f011		       8d 83 02 	      STA	SWBCNT	; Also SWCHB
+     54  f014
+     55  f014		       a9 00		      LDA	#0	; Game stopped.
+     56  f016		       85 82		      STA	MODE	; Set mode.
+     57  f018
+     58  f018		       20 d3 f3 	      JSR	restart_game	; Prepare variables.
+     59  f01b
+     60  f01b				   SHOW_FRAME
+     61  f01b		       a9 00		      LDA	#$00	; Black.
+     62  f01d		       85 09		      STA	COLUBK	; Background color.
+     63  f01f		       a9 88		      LDA	#$88	; Blue.
+     64  f021		       85 08		      STA	COLUPF	; Playfield color.
+     65  f023		       a9 01		      LDA	#$01	; Mirror right side.
+     66  f025		       85 0a		      STA	CTRLPF
+     67  f027
+     68  f027		       85 2b		      STA	HMCLR	; Clear horizontal motion registers
+     69  f029
+     70  f029		       85 2c		      STA	CXCLR	; Clear collision registers
+     71  f02b
+     72  f02b		       85 02		      STA	WSYNC
+     73  f02d		       a9 02		      LDA	#2	; Start of vertical retrace.
+     74  f02f		       85 00		      STA	VSYNC
+     75  f031		       85 02		      STA	WSYNC
+     76  f033		       85 02		      STA	WSYNC
+     77  f035		       85 02		      STA	WSYNC
+     78  f037					      IF	NTSC
+     79  f037		       a9 2a		      LDA	#42	; Time for NTSC top border
+     80  f039				  -	      ELSE
+     81  f039				  -	      LDA	#71	; Time for PAL top border
+     82  f039					      ENDIF
+     83  f039		       8d 96 02 	      STA	TIM64T
+     84  f03c		       a9 00		      LDA	#0	; End of vertical retrace.
+     85  f03e		       85 00		      STA	VSYNC
+     86  f040
+     87  f040		       a6 81		      LDX	NEXTSPR	; Get current sprite.
+     88  f042		       e8		      INX		; Increment.
+     89  f043		       e0 05		      CPX	#5	; Is it 5?
+     90  f045		       d0 02		      BNE	M1	; No, jump.
+     91  f047		       a2 00		      LDX	#0	; Make it zero.
+     92  f049		       86 81	   M1	      STX	NEXTSPR	; Save new current sprite.
+     93  f04b
+     94  f04b		       b5 9f		      LDA	YPOS,X	; Get Y-position of sprite.
+     95  f04d		       18		      CLC
+     96  f04e		       69 08		      ADC	#8	; Adjust for faster drawing.
+     97  f050		       85 98		      STA	YPOS0	; Save Y-position for player 0.
+     98  f052
+     99  f052		       b5 a4		      LDA	SPRITE,X	; Get frame of sprite.
+    100  f054		       a8		      TAY
+    101  f055		       b9 90 ff 	      LDA	sprites_color,Y	; Get color.
+    102  f058		       85 06		      STA	COLUP0	; Set color for player 0.
+    103  f05a
+    104  f05a		       98		      TYA		; Index frame to bitmaps.
+    105  f05b		       0a		      ASL		; x2
+    106  f05c		       0a		      ASL		; x4
+    107  f05d		       0a		      ASL		; x8
+    108  f05e		       a8		      TAY
+    109  f05f		       b9 94 ff 	      LDA	sprites_bitmaps,Y	; Copy in RAM for faster drawing.
+    110  f062		       85 88		      STA	SPRITE0
+    111  f064		       b9 95 ff 	      LDA	sprites_bitmaps+1,Y
+    112  f067		       85 89		      STA	SPRITE0+1
+    113  f069		       b9 96 ff 	      LDA	sprites_bitmaps+2,Y
+    114  f06c		       85 8a		      STA	SPRITE0+2
+    115  f06e		       b9 97 ff 	      LDA	sprites_bitmaps+3,Y
+    116  f071		       85 8b		      STA	SPRITE0+3
+    117  f073		       b9 98 ff 	      LDA	sprites_bitmaps+4,Y
+    118  f076		       85 8c		      STA	SPRITE0+4
+    119  f078		       b9 99 ff 	      LDA	sprites_bitmaps+5,Y
+    120  f07b		       85 8d		      STA	SPRITE0+5
+    121  f07d		       b9 9a ff 	      LDA	sprites_bitmaps+6,Y
+    122  f080		       85 8e		      STA	SPRITE0+6
+    123  f082		       b9 9b ff 	      LDA	sprites_bitmaps+7,Y
+    124  f085		       85 8f		      STA	SPRITE0+7
+    125  f087
+    126  f087		       b5 9a		      LDA	XPOS,X	; Desired X position
+    127  f089		       a2 00		      LDX	#0	; Player 0
+    128  f08b		       20 50 fe 	      JSR	x_position	; Set position.
+    129  f08e
+    130  f08e		       a6 81		      LDX	NEXTSPR	; Get current sprite.
+    131  f090		       e8		      INX		; Increment.
+    132  f091		       e0 05		      CPX	#5	; Is it 5?
+    133  f093		       d0 02		      BNE	M2	; No, jump.
+    134  f095		       a2 00		      LDX	#0	; Make it zero.
+    135  f097		       86 81	   M2	      STX	NEXTSPR	; Save new current sprite.
+    136  f099
+    137  f099		       b5 9f		      LDA	YPOS,X	; Get Y-position of sprite.
+    138  f09b		       18		      CLC
+    139  f09c		       69 08		      ADC	#8	; Adjust for faster drawing.
+    140  f09e		       85 99		      STA	YPOS1	; Save Y-position for player 1.
+    141  f0a0
+    142  f0a0		       b5 a4		      LDA	SPRITE,X	; Get frame of sprite.
+    143  f0a2		       a8		      TAY
+    144  f0a3		       b9 90 ff 	      LDA	sprites_color,Y	; Get color.
+    145  f0a6		       85 07		      STA	COLUP1	; Set color for player 1.
+    146  f0a8
+    147  f0a8		       98		      TYA		; Index frame to bitmaps.
+    148  f0a9		       0a		      ASL		; x2
+    149  f0aa		       0a		      ASL		; x4
+    150  f0ab		       0a		      ASL		; x8
+    151  f0ac		       a8		      TAY
+    152  f0ad		       b9 94 ff 	      LDA	sprites_bitmaps,Y	; Copy in RAM for faster drawing.
+    153  f0b0		       85 90		      STA	SPRITE1
+    154  f0b2		       b9 95 ff 	      LDA	sprites_bitmaps+1,Y
+    155  f0b5		       85 91		      STA	SPRITE1+1
+    156  f0b7		       b9 96 ff 	      LDA	sprites_bitmaps+2,Y
+    157  f0ba		       85 92		      STA	SPRITE1+2
+    158  f0bc		       b9 97 ff 	      LDA	sprites_bitmaps+3,Y
+    159  f0bf		       85 93		      STA	SPRITE1+3
+    160  f0c1		       b9 98 ff 	      LDA	sprites_bitmaps+4,Y
+    161  f0c4		       85 94		      STA	SPRITE1+4
+    162  f0c6		       b9 99 ff 	      LDA	sprites_bitmaps+5,Y
+    163  f0c9		       85 95		      STA	SPRITE1+5
+    164  f0cb		       b9 9a ff 	      LDA	sprites_bitmaps+6,Y
+    165  f0ce		       85 96		      STA	SPRITE1+6
+    166  f0d0		       b9 9b ff 	      LDA	sprites_bitmaps+7,Y
+    167  f0d3		       85 97		      STA	SPRITE1+7
+    168  f0d5
+    169  f0d5		       b5 9a		      LDA	XPOS,X	; Desired X position.
+    170  f0d7		       a2 01		      LDX	#1	; Player 1.
+    171  f0d9		       20 50 fe 	      JSR	x_position	; Set position.
+    172  f0dc
+    173  f0dc		       85 02		      STA	WSYNC	; Wait for scanline start.
+    174  f0de		       85 2a		      STA	HMOVE	; Write HMOVE, only can be done
+    175  f0e0							; just after STA WSYNC.
+    176  f0e0
+    177  f0e0		       a9 00		      LDA	#0
+    178  f0e2		       85 b0		      STA	ROW	; Index into maze data.
+    179  f0e4
+    180  f0e4							;
+    181  f0e4							; Macros for sprite handler.
+    182  f0e4							; This only defines the macros.
+    183  f0e4							;
+    184  f0e4							; No code is generated until the
+    185  f0e4							; macros are invoked.
+    186  f0e4							;
+    187  f0e4
+    188  f0e4					      MAC	sprite_handler_prev
+    189  f0e4
+    190  f0e4					      DEC	YPOS0	; 5: Decrement Y-coordinate for player 0.
+    191  f0e4					      DEC	YPOS1	; 10: Decrement Y-coordinate for player 1.
+    192  f0e4
+    193  f0e4					      LDA	#$00	; 12: No graphic for player 1.
+    194  f0e4					      LDX	YPOS1	; 15: Get Y-coordinate for player 1.
+    195  f0e4					      CPX	#$08	; 17: Is it visible?
+    196  f0e4					      BCS	.+4	; 19: No, jump.
+    197  f0e4					      LDA	SPRITE1,X	; 23: Load graphic from bitmap.
+    198  f0e4					      TAY		; 25: Save into Y register.
+    199  f0e4
+    200  f0e4					      LDA	#$00	; 27: No graphic for player 0.
+    201  f0e4					      LDX	YPOS0	; 30: Get Y-coordinate for player 0.
+    202  f0e4					      CPX	#$08	; 32: Is it visible?
+    203  f0e4					      BCS	.+4	; 34: No, jump.
+    204  f0e4					      LDA	SPRITE0,X	; 38: Load graphic from bitmap.
+    205  f0e4					      TAX		; 40: Save into X register.
+    206  f0e4
+    207  f0e4					      ENDM
+    208  f0e4
+    209  f0e4					      MAC	sprite_handler_post
+    210  f0e4
+    211  f0e4					      STX	GRP0	; 3: Setup graphic for player 0.
+    212  f0e4					      STY	GRP1	; 6: Setup graphic for player 1.
+    213  f0e4
+    214  f0e4					      ENDM
+    215  f0e4
+    216  f0e4							; Move player
+    217  f0e4		       a5 82		      LDA	MODE	; Read game state.
+    218  f0e6		       c9 01		      CMP	#1	; Game playing?
+    219  f0e8		       d0 40		      BNE	M27	; No, jump.
+    220  f0ea		       ad 80 02 	      LDA	SWCHA	; Read the joystick.
+    221  f0ed		       29 f0		      AND	#$F0	; Separate joystick 1 bits.
+    222  f0ef		       c9 f0		      CMP	#$F0	; Any movement?
+    223  f0f1		       f0 37		      BEQ	M27	; No, jump.
+    224  f0f3		       a0 83		      LDY	#$83	; Right + bitmask.
+    225  f0f5		       2a		      ROL		; Move to right? (rotate bit into carry)
+    226  f0f6		       90 0c		      BCC	M5	; Yes, jump. (carry = 0)
+    227  f0f8		       a0 42		      LDY	#$42	; Left + bitmask.
+    228  f0fa		       2a		      ROL		; Move to left? (rotate bit into carry)
+    229  f0fb		       90 07		      BCC	M5	; Yes, jump. (carry = 0)
+    230  f0fd		       a0 21		      LDY	#$21	; Down + bitmask.
+    231  f0ff		       2a		      ROL		; Move to down? (rotate bit into carry)
+    232  f100		       90 02		      BCC	M5	; Yes, jump. (carry = 0)
+    233  f102		       a0 10		      LDY	#$10	; Up + bitmask (it must be)
+    234  f104		       84 85	   M5	      STY	TEMP2	; Desired direction.
+    235  f106		       a2 00		      LDX	#0	; X = 0 (player index)
+    236  f108		       20 25 f4 	      JSR	aligned	; Player is grid-aligned?
+    237  f10b		       90 1a		      BCC	M6	; No, jump.
+    238  f10d		       20 3b f4 	      JSR	can_move	; Get possible directions
+    239  f110		       a5 85		      LDA	TEMP2	; Get desired direction.
+    240  f112		       29 f0		      AND	#$F0	; Separate bitmask.
+    241  f114		       24 84		      BIT	TEMP1	; Can it move?
+    242  f116		       d0 06		      BNE	M28	; No, jump.
+    243  f118		       a5 85		      LDA	TEMP2	; Get desired direction.
+    244  f11a		       29 03		      AND	#$03	; Separate number.
+    245  f11c		       85 a9		      STA	DIR	; Put as new direction.
+    246  f11e		       a4 a9	   M28	      LDY	DIR	; Get current direction.
+    247  f120		       b9 ce f4 	      LDA	bit_mapping+4,Y	; Get bitmask.
+    248  f123		       24 84		      BIT	TEMP1	; Can it move?
+    249  f125		       d0 03		      BNE	M27	; No, jump.
+    250  f127		       20 d2 f4    M6	      JSR	move_sprite	; Move player.
+    251  f12a				   M27
+    252  f12a
+      0  f12a					      sprite_handler_prev
+      1  f12a
+      2  f12a		       c6 98		      DEC	YPOS0
+      3  f12c		       c6 99		      DEC	YPOS1
+      4  f12e
+      5  f12e		       a9 00		      LDA	#$00
+      6  f130		       a6 99		      LDX	YPOS1
+      7  f132		       e0 08		      CPX	#$08
+      8  f134		       b0 02		      BCS	.+4
+      9  f136		       b5 90		      LDA	SPRITE1,X
+     10  f138		       a8		      TAY
+     11  f139
+     12  f139		       a9 00		      LDA	#$00
+     13  f13b		       a6 98		      LDX	YPOS0
+     14  f13d		       e0 08		      CPX	#$08
+     15  f13f		       b0 02		      BCS	.+4
+     16  f141		       b5 88		      LDA	SPRITE0,X
+     17  f143		       aa		      TAX
+     18  f144
+    254  f144
+    255  f144				   WAIT_FOR_TOP
+    256  f144		       ad 84 02 	      LDA	INTIM	; Read timer
+    257  f147		       d0 fb		      BNE	WAIT_FOR_TOP	; Branch if not zero.
+    258  f149		       85 02		      STA	WSYNC	; Resynchronize on last border scanline
+    259  f14b
+    260  f14b		       a9 88		      LDA	#$88	; Color of playfield
+    261  f14d		       85 08		      STA	COLUPF
+    262  f14f		       a9 01		      LDA	#1
+    263  f151		       85 0a		      STA	CTRLPF	; Mirrored playfield
+    264  f153
+    265  f153		       85 02		      STA	WSYNC
+    266  f155		       a9 00		      LDA	#0	; Disable blanking
+    267  f157		       85 01		      STA	VBLANK
+    268  f159		       85 2b		      STA	HMCLR
+    269  f15b
+    270  f15b				   M3
+    271  f15b		       85 02		      STA	WSYNC	; 3:
+      0  f15d					      sprite_handler_post		; 9:
+      1  f15d
+      2  f15d		       86 1b		      STX	GRP0
+      3  f15f		       84 1c		      STY	GRP1
+      4  f161
+    273  f161		       a6 b0		      LDX	ROW	; 12:
+    274  f163		       bd 00 ff 	      LDA	Maze_PF0,X	; 16: Read maze pixels PF0.
+    275  f166		       85 0d		      STA	PF0	; 19: Set TIA PF0
+    276  f168		       bd 30 ff 	      LDA	Maze_PF1,X	; 23: Read maze pixels PF1.
+    277  f16b		       85 0e		      STA	PF1	; 27: Set TIA PF1
+    278  f16d		       bd 60 ff 	      LDA	Maze_PF2,X	; 30: Read maze pixels PF2.
+    279  f170		       85 0f		      STA	PF2	; 34: Set TIA PF2
+    280  f172
+      0  f172					      sprite_handler_prev		; 74: Just in time.
+      1  f172
+      2  f172		       c6 98		      DEC	YPOS0
+      3  f174		       c6 99		      DEC	YPOS1
+      4  f176
+      5  f176		       a9 00		      LDA	#$00
+      6  f178		       a6 99		      LDX	YPOS1
+      7  f17a		       e0 08		      CPX	#$08
+      8  f17c		       b0 02		      BCS	.+4
+      9  f17e		       b5 90		      LDA	SPRITE1,X
+     10  f180		       a8		      TAY
+     11  f181
+     12  f181		       a9 00		      LDA	#$00
+     13  f183		       a6 98		      LDX	YPOS0
+     14  f185		       e0 08		      CPX	#$08
+     15  f187		       b0 02		      BCS	.+4
+     16  f189		       b5 88		      LDA	SPRITE0,X
+     17  f18b		       aa		      TAX
+     18  f18c
+    282  f18c
+    283  f18c		       85 02		      STA	WSYNC	; 3:
+      0  f18e					      sprite_handler_post		; 9:
+      1  f18e
+      2  f18e		       86 1b		      STX	GRP0
+      3  f190		       84 1c		      STY	GRP1
+      4  f192
+    285  f192		       e6 b0		      INC	ROW	; 14:
+      0  f194					      sprite_handler_prev		; 54:
+      1  f194
+      2  f194		       c6 98		      DEC	YPOS0
+      3  f196		       c6 99		      DEC	YPOS1
+      4  f198
+      5  f198		       a9 00		      LDA	#$00
+      6  f19a		       a6 99		      LDX	YPOS1
+      7  f19c		       e0 08		      CPX	#$08
+      8  f19e		       b0 02		      BCS	.+4
+      9  f1a0		       b5 90		      LDA	SPRITE1,X
+     10  f1a2		       a8		      TAY
+     11  f1a3
+     12  f1a3		       a9 00		      LDA	#$00
+     13  f1a5		       a6 98		      LDX	YPOS0
+     14  f1a7		       e0 08		      CPX	#$08
+     15  f1a9		       b0 02		      BCS	.+4
+     16  f1ab		       b5 88		      LDA	SPRITE0,X
+     17  f1ad		       aa		      TAX
+     18  f1ae
+    287  f1ae
+    288  f1ae		       85 02		      STA	WSYNC	; 3:
+      0  f1b0					      sprite_handler_post		; 9:
+      1  f1b0
+      2  f1b0		       86 1b		      STX	GRP0
+      3  f1b2		       84 1c		      STY	GRP1
+      4  f1b4
+      0  f1b4					      sprite_handler_prev		; 49:
+      1  f1b4
+      2  f1b4		       c6 98		      DEC	YPOS0
+      3  f1b6		       c6 99		      DEC	YPOS1
+      4  f1b8
+      5  f1b8		       a9 00		      LDA	#$00
+      6  f1ba		       a6 99		      LDX	YPOS1
+      7  f1bc		       e0 08		      CPX	#$08
+      8  f1be		       b0 02		      BCS	.+4
+      9  f1c0		       b5 90		      LDA	SPRITE1,X
+     10  f1c2		       a8		      TAY
+     11  f1c3
+     12  f1c3		       a9 00		      LDA	#$00
+     13  f1c5		       a6 98		      LDX	YPOS0
+     14  f1c7		       e0 08		      CPX	#$08
+     15  f1c9		       b0 02		      BCS	.+4
+     16  f1cb		       b5 88		      LDA	SPRITE0,X
+     17  f1cd		       aa		      TAX
+     18  f1ce
+    291  f1ce
+    292  f1ce		       85 02		      STA	WSYNC	; 3:
+      0  f1d0					      sprite_handler_post		; 9:
+      1  f1d0
+      2  f1d0		       86 1b		      STX	GRP0
+      3  f1d2		       84 1c		      STY	GRP1
+      4  f1d4
+      0  f1d4					      sprite_handler_prev		; 49:
+      1  f1d4
+      2  f1d4		       c6 98		      DEC	YPOS0
+      3  f1d6		       c6 99		      DEC	YPOS1
+      4  f1d8
+      5  f1d8		       a9 00		      LDA	#$00
+      6  f1da		       a6 99		      LDX	YPOS1
+      7  f1dc		       e0 08		      CPX	#$08
+      8  f1de		       b0 02		      BCS	.+4
+      9  f1e0		       b5 90		      LDA	SPRITE1,X
+     10  f1e2		       a8		      TAY
+     11  f1e3
+     12  f1e3		       a9 00		      LDA	#$00
+     13  f1e5		       a6 98		      LDX	YPOS0
+     14  f1e7		       e0 08		      CPX	#$08
+     15  f1e9		       b0 02		      BCS	.+4
+     16  f1eb		       b5 88		      LDA	SPRITE0,X
+     17  f1ed		       aa		      TAX
+     18  f1ee
+    295  f1ee
+    296  f1ee		       a5 b0		      LDA	ROW	; 52:
+    297  f1f0		       c9 2e		      CMP	#46	; 54: Has it displayed all rows?
+    298  f1f2		       f0 03		      BEQ	M4	; 56: Yes, exit loop.
+    299  f1f4		       4c 5b f1 	      JMP	M3	; 59: No, jump back to display.
+    300  f1f7				   M4
+    301  f1f7
+    302  f1f7		       85 02		      STA	WSYNC
+    303  f1f9		       a9 c8		      LDA	#$C8	; Green color.
+    304  f1fb		       85 06		      STA	COLUP0	; For score digit 0.
+    305  f1fd		       85 07		      STA	COLUP1	; For score digit 1.
+    306  f1ff		       a6 83		      LDX	LIVES	; Get current number of lifes.
+    307  f201		       bd 12 f4 	      LDA	bitmap_lives,X	; Index into table.
+    308  f204		       a0 00		      LDY	#0	; Zero for other playfield registers.
+    309  f206		       84 0d		      STY	PF0	; Zero for PF0.
+    310  f208		       85 0e		      STA	PF1	; Lifes in PF1.
+    311  f20a		       84 0f		      STY	PF2	; Zero for PF2.
+    312  f20c		       a5 ae		      LDA	SCORE1	; First score digit.
+    313  f20e		       0a		      ASL		; x2
+    314  f20f		       0a		      ASL		; x4
+    315  f210		       0a		      ASL		; x8
+    316  f211		       85 84		      STA	TEMP1	; Store offset.
+    317  f213		       a5 af		      LDA	SCORE2	; Second score digit.
+    318  f215		       0a		      ASL		; x2
+    319  f216		       85 10		      STA	RESP0	; Position first digit.
+    320  f218		       85 11		      STA	RESP1	; Position second digit.
+    321  f21a		       0a		      ASL		; x4
+    322  f21b		       0a		      ASL		; x8
+    323  f21c		       85 85		      STA	TEMP2	; Store offset.
+    324  f21e
+    325  f21e		       a0 07		      LDY	#7	; 7 scanlines for score
+    326  f220		       85 02	   M38	      STA	WSYNC	; Synchronize with scanline.
+    327  f222		       a6 84		      LDX	TEMP1	; Row on score 1.
+    328  f224		       bd 00 fe 	      LDA	numbers_bitmaps,X	; Read bitmap.
+    329  f227		       85 1b		      STA	GRP0	; Write as graphic for player 0.
+    330  f229		       a6 85		      LDX	TEMP2	; Row on score 2.
+    331  f22b		       bd 00 fe 	      LDA	numbers_bitmaps,X	; Read bitmap.
+    332  f22e		       85 1c		      STA	GRP1	; Write as graphic for player 1.
+    333  f230		       e6 84		      INC	TEMP1	; Increase row of score 1.
+    334  f232		       e6 85		      INC	TEMP2	; Increase row of score 2.
+    335  f234		       88		      DEY		; Decrease scanlines to display.
+    336  f235		       d0 e9		      BNE	M38	; Jump if still there are some.
+    337  f237
+    338  f237		       a9 02		      LDA	#2	; Enable blanking
+    339  f239		       85 02		      STA	WSYNC
+    340  f23b		       85 01		      STA	VBLANK
+    341  f23d
+    342  f23d					      IF	NTSC
+    343  f23d		       a9 23		      LDA	#35	; Time for NTSC bottom border
+    344  f23f				  -	      ELSE
+    345  f23f				  -	      LDA	#64	; Time for PAL bottom border
+    346  f23f					      ENDIF
+    347  f23f		       8d 96 02 	      STA	TIM64T
+    348  f242
+    349  f242		       a9 00		      LDA	#0	; Disable ALL graphics.
+    350  f244		       85 0d		      STA	PF0	; Playfield.
+    351  f246		       85 0e		      STA	PF1
+    352  f248		       85 0f		      STA	PF2
+    353  f24a		       85 1b		      STA	GRP0	; Player 0.
+    354  f24c		       85 1c		      STA	GRP1	; Player 1.
+    355  f24e		       85 1d		      STA	ENAM0	; Missile 0.
+    356  f250		       85 1e		      STA	ENAM1	; Missile 1.
+    357  f252		       85 1f		      STA	ENABL	; Ball.
+    358  f254
+    359  f254							;
+    360  f254							; Detect reset pressed (stops the game)
+    361  f254							;
+    362  f254		       ad 82 02 	      LDA	SWCHB	; Read console switches.
+    363  f257		       29 01		      AND	#1	; Reset pressed?
+    364  f259		       d0 04		      BNE	M33	; No, jump.
+    365  f25b		       a9 00		      LDA	#0	; Disable game.
+    366  f25d		       85 82		      STA	MODE	; Set mode.
+    367  f25f				   M33
+    368  f25f							;
+    369  f25f							; Detect select pressed (starts the game)
+    370  f25f							;
+    371  f25f		       ad 82 02 	      LDA	SWCHB	; Read console switches.
+    372  f262		       29 02		      AND	#2	; Select pressed?
+    373  f264		       d0 11		      BNE	M32	; No, jump.
+    374  f266		       a9 01		      LDA	#1	; Start game.
+    375  f268		       85 82		      STA	MODE	; Set mode.
+    376  f26a		       a9 03		      LDA	#3	; 3 lifes to start.
+    377  f26c		       85 83		      STA	LIVES	; Set variable.
+    378  f26e		       a9 00		      LDA	#0	; Reset score.
+    379  f270		       85 ae		      STA	SCORE1
+    380  f272		       85 af		      STA	SCORE2
+    381  f274		       20 d3 f3 	      JSR	restart_game	; Reset enemies/diamond.
+    382  f277				   M32
+    383  f277							;
+    384  f277							; Detect gameplay mode
+    385  f277							;
+    386  f277		       a5 82		      LDA	MODE
+    387  f279		       c9 01		      CMP	#1	; Gameplay enabled?
+    388  f27b		       f0 21		      BEQ	M34	; Yes, jump.
+    389  f27d		       a2 00		      LDX	#0	; Turn off background "music"
+    390  f27f		       86 1a		      STX	AUDV1
+    391  f281		       c9 02		      CMP	#2	; Dead player?
+    392  f283		       d0 16		      BNE	M36	; No, jump.
+    393  f285		       c6 86		      DEC	TEMP3	; Countdown.
+    394  f287		       d0 12		      BNE	M36	; Completed? No, jump.
+    395  f289		       c6 83		      DEC	LIVES	; Decrease one life.
+    396  f28b		       f0 0a		      BEQ	M37	; Zero? Yes, jump.
+    397  f28d		       20 d3 f3 	      JSR	restart_game	; Reset enemies/diamond.
+    398  f290		       a9 01		      LDA	#1	; Restart game.
+    399  f292		       85 82		      STA	MODE
+    400  f294		       4c bf f3 	      JMP	M35
+    401  f297
+    402  f297		       a9 00	   M37	      LDA	#0	; Disable game.
+    403  f299		       85 82		      STA	MODE
+    404  f29b				   M36
+    405  f29b		       4c bf f3 	      JMP	M35
+    406  f29e				   M34
+    407  f29e							; Background siren (arcade-like)
+    408  f29e		       a5 80		      LDA	FRAME	; Get frame number.
+    409  f2a0		       29 10		      AND	#$10	; In alternate 16 frames?
+    410  f2a2		       f0 09		      BEQ	M41	; No, jump.
+    411  f2a4		       a5 80		      LDA	FRAME	; Read frame number.
+    412  f2a6		       29 0f		      AND	#$0F	; Modulo 16.
+    413  f2a8		       49 0f		      EOR	#$0F	; Exclusive OR gets value 15-0
+    414  f2aa		       4c b1 f2 	      JMP	M42
+    415  f2ad
+    416  f2ad		       a5 80	   M41	      LDA	FRAME	; Read frame number.
+    417  f2af		       29 0f		      AND	#$0F	; Modulo 16 (0-15)
+    418  f2b1		       85 18	   M42	      STA	AUDF1	; Set frequency.
+    419  f2b3		       a9 0c		      LDA	#12	; Set volume.
+    420  f2b5		       85 16		      STA	AUDC1
+    421  f2b7		       a9 06		      LDA	#6	; Set shape.
+    422  f2b9		       85 1a		      STA	AUDV1
+    423  f2bb
+    424  f2bb							; Catch diamond
+    425  f2bb		       a5 9a		      LDA	XPOS	; X-position of player.
+    426  f2bd		       c5 9e		      CMP	XPOS+4	; Is same as X-position of diamond?
+    427  f2bf		       d0 33		      BNE	M7	; No, jump.
+    428  f2c1		       a5 9f		      LDA	YPOS	; Y-position of player.
+    429  f2c3		       c5 a3		      CMP	YPOS+4	; Is same as Y-position of player?
+    430  f2c5		       d0 2d		      BNE	M7	; No, jump.
+    431  f2c7		       a9 06		      LDA	#6	; Start sound effect.
+    432  f2c9		       85 17		      STA	AUDF0
+    433  f2cb		       a9 06		      LDA	#6
+    434  f2cd		       85 15		      STA	AUDC0
+    435  f2cf		       a9 0c		      LDA	#12
+    436  f2d1		       85 19		      STA	AUDV0
+    437  f2d3		       a9 0f		      LDA	#15	; Duration: 15 frames.
+    438  f2d5		       85 b1		      STA	SOUND
+    439  f2d7		       20 dd f3 	      JSR	restart_diamond	; Put another diamond.
+    440  f2da		       e6 af		      INC	SCORE2	; Increase low-digit of score.
+    441  f2dc		       a5 af		      LDA	SCORE2
+    442  f2de		       c9 0a		      CMP	#10
+    443  f2e0		       d0 12		      BNE	M7
+    444  f2e2		       a9 00		      LDA	#0
+    445  f2e4		       85 af		      STA	SCORE2
+    446  f2e6		       e6 ae		      INC	SCORE1	; Increase high-digit of score.
+    447  f2e8		       a5 ae		      LDA	SCORE1
+    448  f2ea		       c9 0a		      CMP	#10
+    449  f2ec		       d0 06		      BNE	M7
+    450  f2ee		       a9 09		      LDA	#9	; Limit to 99.
+    451  f2f0		       85 af		      STA	SCORE2
+    452  f2f2		       85 ae		      STA	SCORE1
+    453  f2f4				   M7
+    454  f2f4
+    455  f2f4							; Enemy catches player
+    456  f2f4		       a2 01		      LDX	#1	; Enemy 1
+    457  f2f6		       a5 9a	   M8	      LDA	XPOS	; X-position of player.
+    458  f2f8		       38		      SEC
+    459  f2f9		       f5 9a		      SBC	XPOS,X	; Minus X-position of enemy.
+    460  f2fb		       b0 04		      BCS	M29	; Jump if result is positive (no borrow).
+    461  f2fd		       49 ff		      EOR	#$FF	; Negate.
+    462  f2ff		       69 01		      ADC	#1
+    463  f301		       c9 04	   M29	      CMP	#4	; Near to less than 4 pixels?
+    464  f303		       b0 27		      BCS	M30	; No, jump.
+    465  f305		       a5 9f		      LDA	YPOS	; Y-position of player.
+    466  f307		       38		      SEC
+    467  f308		       f5 9f		      SBC	YPOS,X	; Minus Y-position of enemy.
+    468  f30a		       b0 04		      BCS	M31	; Jump if result is positive (no borrow).
+    469  f30c		       49 ff		      EOR	#$FF	; Negate.
+    470  f30e		       69 01		      ADC	#1
+    471  f310		       c9 04	   M31	      CMP	#4	; Near to less than 4 pixels?
+    472  f312		       b0 18		      BCS	M30	; No, jump.
+    473  f314		       a9 02		      LDA	#2	; Player dead.
+    474  f316		       85 82		      STA	MODE	; Set mode.
+    475  f318		       a9 3c		      LDA	#60	; 60 frames.
+    476  f31a		       85 86		      STA	TEMP3	; Set counter.
+    477  f31c		       a9 1e		      LDA	#30	; Start sound effect.
+    478  f31e		       85 17		      STA	AUDF0
+    479  f320		       a9 06		      LDA	#6
+    480  f322		       85 15		      STA	AUDC0
+    481  f324		       a9 0c		      LDA	#12
+    482  f326		       85 19		      STA	AUDV0
+    483  f328		       a9 1e		      LDA	#30	; Duration: 30 frames.
+    484  f32a		       85 b1		      STA	SOUND
+    485  f32c				   M30
+    486  f32c		       e8		      INX		; Go to next enemy.
+    487  f32d		       e0 04		      CPX	#4	; All enemies checked?
+    488  f32f		       d0 c5		      BNE	M8	; No, continue.
+    489  f331
+    490  f331							;
+    491  f331							; Move enemies.
+    492  f331							;
+    493  f331		       ad 82 02 	      LDA	SWCHB	; Read console switches.
+    494  f334		       29 40		      AND	#$40	; Difficulty 1 is (A)dvanced?
+    495  f336		       d0 09		      BNE	M39	; Yes, jump.
+    496  f338		       a5 80		      LDA	FRAME	; Get current frame number.
+    497  f33a		       29 01		      AND	#1	; Only move each 2 frames.
+    498  f33c		       d0 03		      BNE	M39	; Jump if enemies can move.
+    499  f33e		       4c bf f3 	      JMP	M26	; Or avoid code.
+    500  f341				   M39
+    501  f341		       a9 01		      LDA	#1	; Enemy 1.
+    502  f343		       48	   M16	      PHA		; Save counter.
+    503  f344		       aa		      TAX		; Put into X to access enemy.
+    504  f345		       20 25 f4 	      JSR	aligned	; Enemy is grid-aligned?
+    505  f348		       90 5d		      BCC	M17	; No, jump to move.
+    506  f34a		       20 3b f4 	      JSR	can_move	; Get possible directions.
+    507  f34d		       b5 a9		      LDA	DIR,X	; Current direction.
+    508  f34f		       c9 02		      CMP	#2	; Is it up or down?
+    509  f351		       b0 32		      BCS	M21	; No, jump.
+    510  f353		       b5 9a		      LDA	XPOS,X	; Get enemy X-coordinate.
+    511  f355		       c5 9a		      CMP	XPOS	; Compare with player X-coordinate.
+    512  f357		       f0 1a		      BEQ	M25	; Same? Try to move in same direction.
+    513  f359		       90 08		      BCC	M22	; If enemy is to the left, jump.
+    514  f35b		       a0 02		      LDY	#2
+    515  f35d		       a9 40		      LDA	#$40	; Left direction.
+    516  f35f		       24 84		      BIT	TEMP1	; Can it go?
+    517  f361		       f0 42		      BEQ	M23	; Yes, jump.
+    518  f363		       a0 03	   M22	      LDY	#3
+    519  f365		       a9 80		      LDA	#$80	; Right direction.
+    520  f367		       24 84		      BIT	TEMP1	; Can it go?
+    521  f369		       f0 3a		      BEQ	M23	; Yes, jump.
+    522  f36b		       a0 02		      LDY	#2
+    523  f36d		       a9 80		      LDA	#$80	; Left direction.
+    524  f36f		       24 84		      BIT	TEMP1	; Can it go?
+    525  f371		       f0 32		      BEQ	M23	; Yes, jump.
+    526  f373		       b4 a9	   M25	      LDY	DIR,X	; Get current direction.
+    527  f375		       b9 ce f4 	      LDA	bit_mapping+4,Y	; Get bitmask.
+    528  f378		       24 84		      BIT	TEMP1	; Can keep going?
+    529  f37a		       f0 29		      BEQ	M23	; Yes, jump.
+    530  f37c		       c8		      INY		; Try other direction.
+    531  f37d		       98		      TYA
+    532  f37e		       29 03		      AND	#$03	; Limit to four.
+    533  f380		       95 a9		      STA	DIR,X	; Update direction.
+    534  f382		       4c 73 f3 	      JMP	M25	; Verify if can move.
+    535  f385
+    536  f385		       b5 9f	   M21	      LDA	YPOS,X	; Get enemy Y-coordinate.
+    537  f387		       c5 9f		      CMP	YPOS	; Compare with player Y-coordinate.
+    538  f389		       f0 e8		      BEQ	M25	; Same? Try to move in same direction.
+    539  f38b		       90 08		      BCC	M24	; If the enemy is above player, jump.
+    540  f38d		       a0 00		      LDY	#0
+    541  f38f		       a9 10		      LDA	#$10	; Up direction.
+    542  f391		       24 84		      BIT	TEMP1	; Can it go?
+    543  f393		       f0 10		      BEQ	M23	; Yes, jump.
+    544  f395		       a0 01	   M24	      LDY	#1
+    545  f397		       a9 20		      LDA	#$20	; Down direction.
+    546  f399		       24 84		      BIT	TEMP1	; Can it go?
+    547  f39b		       f0 08		      BEQ	M23	; Yes, jump.
+    548  f39d		       a0 00		      LDY	#0
+    549  f39f		       a9 10		      LDA	#$10	; Up direction.
+    550  f3a1		       24 84		      BIT	TEMP1	; Can it go?
+    551  f3a3		       d0 ce		      BNE	M25	; No, try same direction or another.
+    552  f3a5
+    553  f3a5		       94 a9	   M23	      STY	DIR,X	; Write new movement direction.
+    554  f3a7
+    555  f3a7		       20 d2 f4    M17	      JSR	move_sprite	; Move enemy
+    556  f3aa		       a5 80		      LDA	FRAME	; Get current frame number.
+    557  f3ac		       29 04		      AND	#4	; Each four frames change animation.
+    558  f3ae		       4a		      LSR
+    559  f3af		       4a		      LSR
+    560  f3b0		       69 01		      ADC	#1
+    561  f3b2		       95 a4		      STA	SPRITE,X	; Update animation frame.
+    562  f3b4		       68		      PLA		; Restore counter.
+    563  f3b5		       18		      CLC		; Increment by one.
+    564  f3b6		       69 01		      ADC	#1
+    565  f3b8		       c9 04		      CMP	#4	; Processed all three enemies?
+    566  f3ba		       f0 03		      BEQ	M26	; Yes, jump.
+    567  f3bc		       4c 43 f3 	      JMP	M16	; No, continue.
+    568  f3bf				   M26
+    569  f3bf
+    570  f3bf				   M35
+    571  f3bf							;
+    572  f3bf							; Turn off sound effect when playing finished.
+    573  f3bf							;
+    574  f3bf		       c6 b1		      DEC	SOUND	; Decrement duration of sound effect.
+    575  f3c1		       d0 04		      BNE	M40	; Jump if not zero.
+    576  f3c3		       a9 00		      LDA	#0	; Turn off volume.
+    577  f3c5		       85 19		      STA	AUDV0
+    578  f3c7				   M40
+    579  f3c7
+    580  f3c7				   WAIT_FOR_BOTTOM
+    581  f3c7		       ad 84 02 	      LDA	INTIM	; Read timer
+    582  f3ca		       d0 fb		      BNE	WAIT_FOR_BOTTOM	; Branch if not zero.
+    583  f3cc		       85 02		      STA	WSYNC	; Resynchronize on last border scanline
+    584  f3ce
+    585  f3ce		       e6 80		      INC	FRAME	; Count frames
+    586  f3d0
+    587  f3d0		       4c 1b f0 	      JMP	SHOW_FRAME	; Repeat the game loop.
+    588  f3d3
+    589  f3d3							;
+    590  f3d3							; Restart the game.
+    591  f3d3							;
+    592  f3d3				   restart_game
+    593  f3d3		       a2 13		      LDX	#19	; 5 XPOS + 5 YPOS + 5 SPRITE + 5 DIR - 1
+    594  f3d5				   M9
+    595  f3d5		       bd ee f3 	      LDA	start_positions,X	; Load initialization table.
+    596  f3d8		       95 9a		      STA	XPOS,X	; Update RAM.
+    597  f3da		       ca		      DEX		; Decrement counter.
+    598  f3db		       10 f8		      BPL	M9	; Jump if still positive.
+    599  f3dd				   restart_diamond
+    600  f3dd		       20 16 f4 	      JSR	random	; Get a pseudorandom number.
+    601  f3e0		       29 07		      AND	#$07	; Modulo 8.
+    602  f3e2		       aa		      TAX		; Copy to X for index.
+    603  f3e3		       bd 02 f4 	      LDA	x_diamond,X	; Get X position for diamond.
+    604  f3e6		       85 9e		      STA	XPOS+4	; Set X of diamond.
+    605  f3e8		       bd 0a f4 	      LDA	y_diamond,X	; Get Y position for diamond.
+    606  f3eb		       85 a3		      STA	YPOS+4	; Set Y of diamond.
+    607  f3ed		       60		      RTS
+    608  f3ee
+    609  f3ee							;
+    610  f3ee							; Start positions for all sprites.
+    611  f3ee							;
+    612  f3ee				   start_positions
+    613  f3ee		       4d 3d 45 55*	      .byte.b	77,61,69,85,85	; Values for XPOS.
+    614  f3f3		       64 4c 4c 4c*	      .byte.b	100,76,76,76,76	; Values for YPOS.
+    615  f3f8		       00 01 01 01*	      .byte.b	0,1,1,1,3	; Sprite frame number.
+    616  f3fd		       00 02 00 00*	      .byte.b	0,2,0,0,0	; Starting movement direction.
+    617  f402
+    618  f402							; Coordinates where diamonds can appear
+    619  f402							; X and Y coordinates are paired.
+    620  f402				   x_diamond
+    621  f402		       05 95 51 51*	      .byte.b	5,149,81,81,81,89,149,5
+    622  f40a				   y_diamond
+    623  f40a		       04 04 1c 4c*	      .byte.b	4,4,28,76,132,156,172,172
+    624  f412
+    625  f412							; Playfield bitmap for available lives.
+    626  f412				   bitmap_lives
+    627  f412		       00 80 a0 a8	      .byte.b	$00,$80,$a0,$a8
+    628  f416
+    629  f416							;
+    630  f416							; Generates a pseudo-random number.
+    631  f416							;
+    632  f416				   random
+    633  f416		       a5 87		      LDA	RAND
+    634  f418		       38		      SEC
+    635  f419		       6a		      ROR
+    636  f41a		       45 80		      EOR	FRAME
+    637  f41c		       6a		      ROR
+    638  f41d		       45 87		      EOR	RAND
+    639  f41f		       6a		      ROR
+    640  f420		       49 09		      EOR	#9
+    641  f422		       85 87		      STA	RAND
+    642  f424		       60		      RTS
+    643  f425
+    644  f425							;
+    645  f425							; Detect if a sprite is grid-aligned
+    646  f425							;
+    647  f425							; X = Sprite number (0-4)
+    648  f425							;
+    649  f425							; Returns: Carry flag set if it is grid-aligned.
+    650  f425							;
+    651  f425				   aligned
+    652  f425		       b5 9a		      LDA	XPOS,X	; Get the X-position of sprite.
+    653  f427		       38		      SEC
+    654  f428		       e9 05		      SBC	#5	; Minus 5.
+    655  f42a		       29 07		      AND	#7	; Modulo 8.
+    656  f42c		       d0 0b		      BNE	M15	; If not zero, jump.
+    657  f42e		       b5 9f		      LDA	YPOS,X	; Get the Y-position of sprite.
+    658  f430		       38		      SEC
+    659  f431		       e9 04		      SBC	#4	; Minus 4.
+    660  f433		       29 07		      AND	#7	; Modulo 8.
+    661  f435		       d0 02		      BNE	M15	; If not zero, jump.
+    662  f437		       38		      SEC		; Set carry flag (aligned).
+    663  f438		       60		      RTS
+    664  f439
+    665  f439		       18	   M15	      CLC		; Clear carry flag (unaligned).
+    666  f43a		       60		      RTS
+    667  f43b
+    668  f43b							;
+    669  f43b							; Detect possible directions for a sprite.
+    670  f43b							; The sprite should be grid-aligned.
+    671  f43b							;
+    672  f43b							; X = Sprite number (0-4)
+    673  f43b							;
+    674  f43b				   can_move
+    675  f43b		       8a		      TXA
+    676  f43c		       48		      PHA
+    677  f43d							; Test for up direction.
+    678  f43d		       b5 9f		      LDA	YPOS,X	; Y-coordinate of sprite.
+    679  f43f		       a8		      TAY		; Copy into Y.
+    680  f440		       88		      DEY		; One pixel upwards
+    681  f441		       b5 9a		      LDA	XPOS,X	; X-coordinate of sprite.
+    682  f443		       aa		      TAX		; Copy into X.
+    683  f444		       20 7d f4 	      JSR	hit_wall	; Hit wall?
+    684  f447		       66 84		      ROR	TEMP1	; Insert carry into bit 7.
+    685  f449
+    686  f449		       68		      PLA
+    687  f44a		       aa		      TAX
+    688  f44b		       48		      PHA
+    689  f44c							; Test for down direction.
+    690  f44c		       b5 9f		      LDA	YPOS,X	; Y-coordinate of sprite.
+    691  f44e		       18		      CLC
+    692  f44f		       69 08		      ADC	#8	; 8 pixels downward.
+    693  f451		       a8		      TAY		; Put into Y.
+    694  f452		       b5 9a		      LDA	XPOS,X	; X-coordinate of sprite.
+    695  f454		       aa		      TAX		; Copy into X.
+    696  f455		       20 7d f4 	      JSR	hit_wall	; Hit wall?
+    697  f458		       66 84		      ROR	TEMP1	; Insert carry into bit 7.
+    698  f45a
+    699  f45a		       68		      PLA
+    700  f45b		       aa		      TAX
+    701  f45c		       48		      PHA
+    702  f45d							; Test for left direction.
+    703  f45d		       b5 9f		      LDA	YPOS,X	; Y-coordinate of sprite.
+    704  f45f		       a8		      TAY		; Put into Y.
+    705  f460		       b5 9a		      LDA	XPOS,X	; X-coordinate of sprite.
+    706  f462		       aa		      TAX		; Put into X.
+    707  f463		       ca		      DEX		; One pixel to left.
+    708  f464		       20 7d f4 	      JSR	hit_wall	; Hit wall?
+    709  f467		       66 84		      ROR	TEMP1	; Insert carry into bit 7.
+    710  f469
+    711  f469		       68		      PLA
+    712  f46a		       aa		      TAX
+    713  f46b		       48		      PHA
+    714  f46c							; Test for right direction.
+    715  f46c		       b5 9f		      LDA	YPOS,X	; Y-coordinate of sprite.
+    716  f46e		       a8		      TAY		; Put into Y.
+    717  f46f		       b5 9a		      LDA	XPOS,X	; X-coordinate of sprite.
+    718  f471		       18		      CLC
+    719  f472		       69 08		      ADC	#8	; 8 pixels to the right.
+    720  f474		       aa		      TAX		; Put into X.
+    721  f475		       20 7d f4 	      JSR	hit_wall	; Hit wall?
+    722  f478		       66 84		      ROR	TEMP1	; Insert carry into bit 7.
+    723  f47a		       68		      PLA
+    724  f47b		       aa		      TAX
+    725  f47c		       60		      RTS
+    726  f47d
+    727  f47d							; Detect wall hit
+    728  f47d							; X = X-coordinate
+    729  f47d							; Y = Y-coordinate
+    730  f47d				   hit_wall
+    731  f47d		       98		      TYA		; Copy Y into A
+    732  f47e		       4a		      LSR		; /2
+    733  f47f		       4a		      LSR		; /4
+    734  f480		       85 86		      STA	TEMP3	; Maze row to test.
+    735  f482		       ca		      DEX
+    736  f483		       8a		      TXA		; Copy X into A.
+    737  f484		       4a		      LSR		; Divide by 4 as each playfield...
+    738  f485		       4a		      LSR		; ...pixel is 4 pixels.
+    739  f486		       aa		      TAX
+    740  f487		       bd a2 f4 	      LDA	wall_mapping,X
+    741  f48a		       29 f8		      AND	#$F8	; Playfield register to test (PF0/PF1/PF2)
+    742  f48c		       18		      CLC
+    743  f48d		       65 86		      ADC	TEMP3	; Add to maze row to create byte offset.
+    744  f48f		       a8		      TAY		; Y = Playfield byte offset
+    745  f490		       bd a2 f4 	      LDA	wall_mapping,X
+    746  f493		       29 07		      AND	#$07	; Extract bit number.
+    747  f495		       aa		      TAX
+    748  f496		       bd ca f4 	      LDA	bit_mapping,X	; Convert to bit mask.
+    749  f499		       39 00 ff 	      AND	Maze_PF0,Y	; Check against maze data
+    750  f49c		       f0 02		      BEQ	no_hit	; Jump if zero (no hit).
+    751  f49e
+    752  f49e		       38		      SEC		; Wall hit.
+    753  f49f		       60		      RTS
+    754  f4a0
+    755  f4a0		       18	   no_hit     CLC		; No wall hit.
+    756  f4a1		       60		      RTS
+    757  f4a2
+    758  f4a2							; Mapping of horizontal pixel to maze byte.
+    759  f4a2				   wall_mapping
+    760  f4a2		       04 05 06 07	      .byte.b	$04,$05,$06,$07
+    761  f4a6		       37 36 35 34*	      .byte.b	$37,$36,$35,$34,$33,$32,$31,$30
+    762  f4ae		       60 61 62 63*	      .byte.b	$60,$61,$62,$63,$64,$65,$66,$67
+    763  f4b6		       67 66 65 64*	      .byte.b	$67,$66,$65,$64,$63,$62,$61,$60
+    764  f4be		       30 31 32 33*	      .byte.b	$30,$31,$32,$33,$34,$35,$36,$37
+    765  f4c6		       07 06 05 04	      .byte.b	$07,$06,$05,$04
+    766  f4ca
+    767  f4ca							; Conversion of bit to bitmask.
+    768  f4ca				   bit_mapping
+    769  f4ca		       01 02 04 08*	      .byte.b	$01,$02,$04,$08,$10,$20,$40,$80
+    770  f4d2
+    771  f4d2							;
+    772  f4d2							; Move a sprite in the current direction.
+    773  f4d2							;
+    774  f4d2				   move_sprite
+    775  f4d2		       b5 a9		      LDA	DIR,X	; Get the current direction of sprite.
+    776  f4d4		       c9 03		      CMP	#3	; Right?
+    777  f4d6		       f0 11		      BEQ	M20	; Yes, jump.
+    778  f4d8		       c9 02		      CMP	#2	; Left?
+    779  f4da		       f0 0a		      BEQ	M19	; Yes, jump.
+    780  f4dc		       c9 01		      CMP	#1	; Down?
+    781  f4de		       f0 03		      BEQ	M18	; Yes, jump.
+    782  f4e0		       d6 9f		      DEC	YPOS,X	; Must be up. Decrease Y-coordinate.
+    783  f4e2		       60		      RTS
+    784  f4e3
+    785  f4e3		       f6 9f	   M18	      INC	YPOS,X	; Increase Y-coordinate.
+    786  f4e5		       60		      RTS
+    787  f4e6
+    788  f4e6		       d6 9a	   M19	      DEC	XPOS,X	; Decrease X-coordinate.
+    789  f4e8		       60		      RTS
+    790  f4e9
+    791  f4e9		       f6 9a	   M20	      INC	XPOS,X	; Increase X-coordinate.
+    792  f4eb		       60		      RTS
+    793  f4ec
+    794  fe00					      org	$fe00
+    795  fe00
+    796  fe00				   numbers_bitmaps
+    797  fe00		       fe 82 82 86*	      .byte.b	$fe,$82,$82,$86,$86,$86,$fe,$00	; 0
+    798  fe08		       10 10 10 30*	      .byte.b	$10,$10,$10,$30,$30,$30,$30,$00	; 1
+    799  fe10		       fe 02 02 fe*	      .byte.b	$fe,$02,$02,$fe,$c0,$c0,$fe,$00	; 2
+    800  fe18		       fe 02 02 fe*	      .byte.b	$fe,$02,$02,$fe,$06,$06,$fe,$00	; 3
+    801  fe20		       82 82 82 fe*	      .byte.b	$82,$82,$82,$fe,$06,$06,$06,$00	; 4
+    802  fe28		       fe 80 80 fe*	      .byte.b	$fe,$80,$80,$fe,$06,$06,$fe,$00	; 5
+    803  fe30		       fe 80 80 fe*	      .byte.b	$fe,$80,$80,$fe,$c6,$c6,$fe,$00	; 6
+    804  fe38		       fe 02 02 02*	      .byte.b	$fe,$02,$02,$02,$06,$06,$06,$00	; 7
+    805  fe40		       fe 82 82 fe*	      .byte.b	$fe,$82,$82,$fe,$c6,$c6,$fe,$00	; 8
+    806  fe48		       fe 82 82 fe*	      .byte.b	$fe,$82,$82,$fe,$06,$06,$fe,$00	; 9
+    807  fe50
+    808  fe50							;
+    809  fe50							; Position an item in X
+    810  fe50							; Input:
+    811  fe50							;   A = X position (1-159)
+    812  fe50							;   X = Object to position (0=P0, 1=P1, 2=M0, 3=M1, 4=BALL)
+    813  fe50							;
+    814  fe50							; The internal loop should fit a 256-byte page.
+    815  fe50							;
+    816  fe50				   x_position		; Start cycle
+    817  fe50		       85 02		      sta	WSYNC	; 3: Start scanline synchro
+    818  fe52		       38		      sec		; 5: Set carry (so SBC doesn't subtract extra)
+    819  fe53		       a4 80		      ldy	$80	; 7: Eat 3 cycles
+    820  fe55				   x_p1
+    821  fe55		       e9 0f		      sbc	#15	; 10: Divide X by 15
+    822  fe57		       b0 fc		      bcs	x_p1	; 12: If the loop goes on, add 5 cycles each time
+    823  fe59				   x_p2
+    824  fe59		       a8		      tay		; 14:
+    825  fe5a		       b9 00 fe 	      lda	fine_adjust-$f1,y	; 18:
+    826  fe5d		       95 20		      sta	HMP0,x	; 22: Fine position
+    827  fe5f		       95 10		      sta	RESP0,x	; 26: Time of setup for coarse position.
+    828  fe61		       60		      rts
+    829  fe62
+    830  fe62				   x_position_end
+    831  fe62
+    832  fe62							; Detect code divided between two pages
+    833  fe62							; Cannot afford it because it takes one cycle more
+    834  fe62				  -	      if	(x_p1 & $ff00) != (x_p2 & $ff00)
+    835  fe62				  -	      echo	"Error: Page crossing"
+    836  fe62				  -	      err		; Force assembler error
+    837  fe62					      endif
+    838  fe62
+    839  fef1					      org	$fef1	; Table at last page of ROM
+    840  fef1							; Shouldn't cross page
+    841  fef1				   fine_adjust
+    842  fef1		       70		      .byte.b	$70	; 7px to left.
+    843  fef2		       60		      .byte.b	$60	; 6px to left.
+    844  fef3		       50		      .byte.b	$50	; 5px to left.
+    845  fef4		       40		      .byte.b	$40	; 4px to left.
+    846  fef5		       30		      .byte.b	$30	; 3px to left.
+    847  fef6		       20		      .byte.b	$20	; 2px to left.
+    848  fef7		       10		      .byte.b	$10	; 1px to left.
+    849  fef8		       00		      .byte.b	$00	; No adjustment.
+    850  fef9		       f0		      .byte.b	$f0	; 1px to right.
+    851  fefa		       e0		      .byte.b	$e0	; 2px to right.
+    852  fefb		       d0		      .byte.b	$d0	; 3px to right.
+    853  fefc		       c0		      .byte.b	$c0	; 4px to right.
+    854  fefd		       b0		      .byte.b	$b0	; 5px to right.
+    855  fefe		       a0		      .byte.b	$a0	; 6px to right.
+    856  feff		       90		      .byte.b	$90	; 7px to right.
+    857  ff00
+    858  ff00							; mode: symmetric mirrored line-height 4
+    859  ff00
+    860  ff00				   Maze_PF0
+    861  ff00		       f0 10 10 90*	      .byte.b	$F0,$10,$10,$90,$90,$90,$90,$10
+    862  ff08		       10 90 90 90*	      .byte.b	$10,$90,$90,$90,$90,$10,$10,$F0
+    863  ff10		       00 00 00 00*	      .byte.b	$00,$00,$00,$00,$00,$00,$00,$00
+    864  ff18		       00 00 00 00*	      .byte.b	$00,$00,$00,$00,$F0,$10,$10,$90
+    865  ff20		       90 10 10 70*	      .byte.b	$90,$10,$10,$70,$40,$40,$70,$10
+    866  ff28		       10 90 90 10*	      .byte.b	$10,$90,$90,$10,$10,$F0,$00,$00
+    867  ff30				   Maze_PF1
+    868  ff30		       ff 00 00 e7*	      .byte.b	$FF,$00,$00,$E7,$24,$24,$E7,$00
+    869  ff38		       00 e6 26 26*	      .byte.b	$00,$E6,$26,$26,$E6,$06,$06,$E7
+    870  ff40		       24 24 27 26*	      .byte.b	$24,$24,$27,$26,$26,$20,$20,$26
+    871  ff48		       26 26 26 26*	      .byte.b	$26,$26,$26,$26,$E6,$00,$00,$E7
+    872  ff50		       e7 60 60 66*	      .byte.b	$E7,$60,$60,$66,$66,$66,$66,$06
+    873  ff58		       06 ff ff 00*	      .byte.b	$06,$FF,$FF,$00,$00,$FF,$00,$00
+    874  ff60				   Maze_PF2
+    875  ff60		       3f 20 20 27*	      .byte.b	$3F,$20,$20,$27,$24,$24,$E7,$00
+    876  ff68		       00 fe 02 02*	      .byte.b	$00,$FE,$02,$02,$FE,$80,$80,$9F
+    877  ff70		       90 90 9f 00*	      .byte.b	$90,$90,$9F,$00,$00,$FE,$02,$02
+    878  ff78		       fe 00 00 fe*	      .byte.b	$FE,$00,$00,$FE,$FE,$80,$80,$9F
+    879  ff80		       9f 00 00 fe*	      .byte.b	$9F,$00,$00,$FE,$02,$02,$FE,$80
+    880  ff88		       80 9f 9f 00*	      .byte.b	$80,$9F,$9F,$00,$00,$FF,$00,$00
+    881  ff90
+    882  ff90							; Color for each sprite frame
+    883  ff90				   sprites_color
+    884  ff90		       2e 5e 5e 0e	      .byte.b	$2e,$5e,$5e,$0e
+    885  ff94
+    886  ff94							; Bitmaps for each sprite frame.
+    887  ff94				   sprites_bitmaps
+    888  ff94		       3c		      .byte.b	%00111100	; 0: Happy face.
+    889  ff95		       7e		      .byte.b	%01111110
+    890  ff96		       c3		      .byte.b	%11000011
+    891  ff97		       bd		      .byte.b	%10111101
+    892  ff98		       ff		      .byte.b	%11111111
+    893  ff99		       99		      .byte.b	%10011001
+    894  ff9a		       7e		      .byte.b	%01111110
+    895  ff9b		       3c		      .byte.b	%00111100
+    896  ff9c
+    897  ff9c		       c0		      .byte.b	%11000000	; 1: Monster 1.
+    898  ff9d		       7c		      .byte.b	%01111100
+    899  ff9e		       43		      .byte.b	%01000011
+    900  ff9f		       e6		      .byte.b	%11100110
+    901  ffa0		       ff		      .byte.b	%11111111
+    902  ffa1		       db		      .byte.b	%11011011
+    903  ffa2		       bd		      .byte.b	%10111101
+    904  ffa3		       7e		      .byte.b	%01111110
+    905  ffa4
+    906  ffa4		       03		      .byte.b	%00000011	; 2: Monster 2.
+    907  ffa5		       3e		      .byte.b	%00111110
+    908  ffa6		       c2		      .byte.b	%11000010
+    909  ffa7		       67		      .byte.b	%01100111
+    910  ffa8		       ff		      .byte.b	%11111111
+    911  ffa9		       db		      .byte.b	%11011011
+    912  ffaa		       bd		      .byte.b	%10111101
+    913  ffab		       7e		      .byte.b	%01111110
+    914  ffac
+    915  ffac		       00		      .byte.b	%00000000	; 3: Diamond.
+    916  ffad		       18		      .byte.b	%00011000
+    917  ffae		       34		      .byte.b	%00110100
+    918  ffaf		       7a		      .byte.b	%01111010
+    919  ffb0		       fd		      .byte.b	%11111101
+    920  ffb1		       83		      .byte.b	%10000011
+    921  ffb2		       7e		      .byte.b	%01111110
+    922  ffb3		       00		      .byte.b	%00000000
+    923  ffb4
+    924  fffc					      ORG	$FFFC
+    925  fffc		       00 f0		      .word.w	START
+    926  fffe		       00 f0		      .word.w	START

@@ -1,0 +1,163 @@
+--- Symbol List (sorted by symbol)
+aligned                  f425              (R )
+AUDC0                    0015              (R )
+AUDC1                    0016              (R )
+AUDF0                    0017              (R )
+AUDF1                    0018              (R )
+AUDV0                    0019              (R )
+AUDV1                    001a              (R )
+bit_mapping              f4ca              (R )
+bitmap_lives             f412              (R )
+can_move                 f43b              (R )
+CLEAR                    f007              (R )
+COLUBK                   0009              (R )
+COLUP0                   0006              (R )
+COLUP1                   0007              (R )
+COLUPF                   0008              (R )
+CTRLPF                   000a              (R )
+CXBLPF                   0006                  
+CXCLR                    002c              (R )
+CXM0FB                   0004                  
+CXM0P                    0000                  
+CXM1FB                   0005                  
+CXM1P                    0001                  
+CXP0FB                   0002                  
+CXP1FB                   0003                  
+CXPPMM                   0007                  
+DIR                      00a9              (R )
+ENABL                    001f              (R )
+ENAM0                    001d              (R )
+ENAM1                    001e              (R )
+fine_adjust              fef1              (R )
+FRAME                    0080              (R )
+GRP0                     001b              (R )
+GRP1                     001c              (R )
+hit_wall                 f47d              (R )
+HMBL                     0024                  
+HMCLR                    002b              (R )
+HMM0                     0022                  
+HMM1                     0023                  
+HMOVE                    002a              (R )
+HMP0                     0020              (R )
+HMP1                     0021                  
+INPT0                    0008                  
+INPT1                    0009                  
+INPT2                    000a                  
+INPT3                    000b                  
+INPT4                    000c                  
+INPT5                    000d                  
+INTIM                    0284              (R )
+LIVES                    0083              (R )
+M1                       f049              (R )
+M15                      f439              (R )
+M16                      f343              (R )
+M17                      f3a7              (R )
+M18                      f4e3              (R )
+M19                      f4e6              (R )
+M2                       f097              (R )
+M20                      f4e9              (R )
+M21                      f385              (R )
+M22                      f363              (R )
+M23                      f3a5              (R )
+M24                      f395              (R )
+M25                      f373              (R )
+M26                      f3bf              (R )
+M27                      f12a              (R )
+M28                      f11e              (R )
+M29                      f301              (R )
+M3                       f15b              (R )
+M30                      f32c              (R )
+M31                      f310              (R )
+M32                      f277              (R )
+M33                      f25f              (R )
+M34                      f29e              (R )
+M35                      f3bf              (R )
+M36                      f29b              (R )
+M37                      f297              (R )
+M38                      f220              (R )
+M39                      f341              (R )
+M4                       f1f7              (R )
+M40                      f3c7              (R )
+M41                      f2ad              (R )
+M42                      f2b1              (R )
+M5                       f104              (R )
+M6                       f127              (R )
+M7                       f2f4              (R )
+M8                       f2f6              (R )
+M9                       f3d5              (R )
+Maze_PF0                 ff00              (R )
+Maze_PF1                 ff30              (R )
+Maze_PF2                 ff60              (R )
+MODE                     0082              (R )
+move_sprite              f4d2              (R )
+NEXTSPR                  0081              (R )
+no_hit                   f4a0              (R )
+NTSC                     0001              (R )
+numbers_bitmaps          fe00              (R )
+NUSIZ0                   0004                  
+NUSIZ1                   0005                  
+PF0                      000d              (R )
+PF1                      000e              (R )
+PF2                      000f              (R )
+RAND                     0087              (R )
+random                   f416              (R )
+REFP0                    000b                  
+REFP1                    000c                  
+RESBL                    0014                  
+RESM0                    0012                  
+RESM1                    0013                  
+RESMP0                   0028                  
+RESMP1                   0029                  
+RESP0                    0010              (R )
+RESP1                    0011              (R )
+restart_diamond          f3dd              (R )
+restart_game             f3d3              (R )
+ROW                      00b0              (R )
+RSYNC                    0003                  
+SCORE1                   00ae              (R )
+SCORE2                   00af              (R )
+SHOW_FRAME               f01b              (R )
+SOUND                    00b1              (R )
+SPRITE                   00a4              (R )
+SPRITE0                  0088              (R )
+SPRITE1                  0090              (R )
+sprites_bitmaps          ff94              (R )
+sprites_color            ff90              (R )
+START                    f000              (R )
+start_positions          f3ee              (R )
+SWACNT                   0281              (R )
+SWBCNT                   0283              (R )
+SWCHA                    0280              (R )
+SWCHB                    0282              (R )
+T1024T                   0297                  
+TEMP1                    0084              (R )
+TEMP2                    0085              (R )
+TEMP3                    0086              (R )
+TIA_BASE_ADDRESS         0000              (R )
+TIA_BASE_READ_ADDRESS    0000              (R )
+TIA_BASE_WRITE_ADDRESS   0000              (R )
+TIM1T                    0294                  
+TIM64T                   0296              (R )
+TIM8T                    0295                  
+TIMINT                   0285                  
+VBLANK                   0001              (R )
+VDELBL                   0027                  
+VDELP0                   0025                  
+VDELP1                   0026                  
+VERSION_VCS              0069                  
+VSYNC                    0000              (R )
+WAIT_FOR_BOTTOM          f3c7              (R )
+WAIT_FOR_TOP             f144              (R )
+wall_mapping             f4a2              (R )
+WSYNC                    0002              (R )
+x_diamond                f402              (R )
+x_p1                     fe55              (R )
+x_p2                     fe59              (R )
+x_position               fe50              (R )
+x_position_end           fe62                  
+XPOS                     009a              (R )
+y_diamond                f40a              (R )
+YPOS                     009f              (R )
+YPOS0                    0098              (R )
+YPOS1                    0099              (R )
+--- End of Symbol List.
