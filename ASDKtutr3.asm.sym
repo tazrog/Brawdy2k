@@ -1,0 +1,304 @@
+--- Symbol List (sorted by symbol)
+0.condpart0              f9e3                  
+0.condpart1              f9f2                  
+0.condpart2              fa0d                  
+0.jumparound             f9ec              (R )
+0.jumparound2            f9fb              (R )
+0.L012                   f9dd                  
+0.L013                   f9dd                  
+0.L014                   f9dd                  
+0.L015                   f9ea                  
+0.L016                   f9ec                  
+0.L017                   f9ec                  
+0.L018                   f9f9                  
+0.L019                   f9fb                  
+0.L020                   f9fb                  
+0.L021                   f9fb                  
+0.L022                   f9fb                  
+0.L023                   f9fb                  
+0.L024                   f9fb                  
+0.L025                   fa00                  
+0.L026                   fa07                  
+0.skipL014               f9ea              (R )
+0.skipL017               f9f9              (R )
+0.skipL026               fa11              (R )
+a                        0082              (R )
+AbstractPlayfieldBuilder f413              (R )
+AUDC0                    0015              (R )
+AUDC1                    0016              (R )
+AUDF0                    0017              (R )
+AUDF1                    0018              (R )
+AUDV0                    0019              (R )
+AUDV1                    001a              (R )
+b                        0083              (R )
+Bank0                    f200              (R )
+Bank1                    f200              (R )
+Bank2                    f200              (R )
+BITIndex                 0090              (R )
+bitpos1                  f595              (R )
+bitpos10                 f821              (R )
+bitpos11                 f896              (R )
+bitpos12                 f913              (R )
+bitpos2                  f5bd              (R )
+bitpos3                  f5ed              (R )
+bitpos4                  f624              (R )
+bitpos5                  f664              (R )
+bitpos6                  f6ac              (R )
+bitpos7                  f6fc              (R )
+bitpos8                  f754              (R )
+bitpos9                  f7b4              (R )
+bitposdone               f98f              (R )
+bitstatus                009c                  
+bitx                     009a              (R )
+bity                     009b              (R )
+bx                       0098                  
+by                       0099                  
+BYTErowoffset            009d              (R )
+c                        0084              (R )
+callbank1ForMusicEngine  f206              (R )
+callbank1ForMusicEngineRecvd f206                  
+CallBank1ToLoadCBSRAMwithGameScreenBitmap f224                  
+CallBank1ToLoadCBSRAMwithGameScreenBitmaprecvd f224                  
+CallBank1ToLoadCBSRAMwithLargeBitmap f210              (R )
+CallBank1ToLoadCBSRAMwithLargeBitmapRecvd f210                  
+CallBank1ToLoadCBSRAMwithLargeBitmapSayingREADYPLAYER1 f21a                  
+CallBank1ToLoadCBSRAMwithLargeBitmapSayingREADYPLAYER1recvd f21a                  
+CLEAN_START              f22e                  
+clear0                   fa75              (R )
+clear1                   fa94              (R )
+clear10                  fbab              (R )
+clear11                  fbc6              (R )
+clear2                   fab3              (R )
+clear3                   fad2              (R )
+clear4                   faf1              (R )
+clear5                   fb10              (R )
+clear6                   fb2f              (R )
+clear7                   fb4e              (R )
+clear8                   fb6d              (R )
+clear9                   fb8c              (R )
+clearram                 f232              (R )
+COLUBK                   0009                  
+COLUP0                   0006              (R )
+COLUP1                   0007              (R )
+COLUPF                   0008              (R )
+continuenote             f53e              (R )
+continuewaitnextnote     f581              (R )
+CTRLPF                   000a                  
+CXBLPF                   0006                  
+CXCLR                    002c                  
+CXM0FB                   0004                  
+CXM0P                    0000                  
+CXM1FB                   0005                  
+CXM1P                    0001                  
+CXP0FB                   0002                  
+CXP1FB                   0003                  
+CXPPMM                   0007                  
+d                        0085              (R )
+doit                     f41d              (R )
+done0                    fa77              (R )
+done1                    fa96              (R )
+done10                   fbad              (R )
+done11                   fbc8              (R )
+done2                    fab5              (R )
+done3                    fad4              (R )
+done4                    faf3              (R )
+done5                    fb12              (R )
+done6                    fb31              (R )
+done7                    fb50              (R )
+done8                    fb6f              (R )
+done9                    fb8e              (R )
+donegetset               fbcb              (R )
+doneplayfieldcore        f380              (R )
+donesinglebyteoffset     fa4d              (R )
+e                        0086              (R )
+ENABL                    001f                  
+ENAM0                    001d              (R )
+ENAM1                    001e              (R )
+f                        0087              (R )
+flatten_y                fa51              (R )
+framerelay               f9b2              (R )
+g                        0088                  
+GameScreenBitmap         f43b              (R )
+getbitstatus             fa37                  
+getset0                  fa62                  
+getset1                  fa7d              (R )
+getset10                 fb94              (R )
+getset11                 fbb3              (R )
+getset2                  fa9c              (R )
+getset3                  fabb              (R )
+getset4                  fada              (R )
+getset5                  faf9              (R )
+getset6                  fb18              (R )
+getset7                  fb37              (R )
+getset8                  fb56              (R )
+getset9                  fb75              (R )
+GRP0                     001b              (R )
+GRP1                     001c              (R )
+h                        0089                  
+HMBL                     0024                  
+HMCLR                    002b                  
+HMM0                     0022                  
+HMM1                     0023                  
+HMOVE                    002a              (R )
+HMP0                     0020              (R )
+HMP1                     0021                  
+i                        008a                  
+INPT0                    0008                  
+INPT1                    0009                  
+INPT2                    000a                  
+INPT3                    000b                  
+INPT4                    000c                  
+INPT5                    000d                  
+INTIM                    0284              (R )
+j                        008b                  
+jmparoundcallbank1ForMusicEngine f22e              (R )
+jmparoundcallbank1stub   f22e              (R )
+jump1                    f573              (R )
+jumparoundpaepf          f9ad              (R )
+jumparoundspritedetail   f354              (R )
+jumparoundspritedetailb  f36e              (R )
+jumparoundspriteinit     f35c              (R )
+jumparoundspriteinitb    f376              (R )
+k                        00e8                  
+l                        00e9                  
+LD7E0                    f395                  
+LD7EA                    f39f              (R )
+LD7EE                    f3a1              (R )
+LoadLargeBitMapIntoCBSRAM f22e              (R )
+LoadLargeBitMapIntoCBSRAMforGameScreen f24c              (R )
+LoadLargeBitMapIntoCBSRAMSayingREADYPLAYER1 f23d              (R )
+loadplayer0              f3f9              (R )
+loadplayer1              f406              (R )
+m                        00ea                  
+missile0done             f330              (R )
+Missile0on               f32e              (R )
+missile0x                00e2              (R )
+missile0y                00e3              (R )
+missile1set              f340              (R )
+missile1x                00e4              (R )
+missile1y                00e5              (R )
+MusicData                f58e              (R )
+musicfinish              f58d              (R )
+MUSICINDEX               0080              (R )
+MyAbstractExtendedPlayfield f25b              (R )
+MyAbstractExtendedPlayfieldSCR f100              (R )
+MyAbstractExtendedPlayfieldSCW f000              (R )
+MyPlayfieldCore          f2f6              (R )
+MyVerticalBlank          f2e7              (R )
+n                        00eb                  
+NUSIZ0                   0004                  
+NUSIZ1                   0005                  
+o                        00ec                  
+obtainnewposition        f31c              (R )
+ok1done                  f52e              (R )
+opt1                     f560              (R )
+Overscan                 f38b              (R )
+Overscan2                fa2f              (R )
+p                        00e6                  
+p0                       0091              (R )
+p1                       0092              (R )
+p2                       0093              (R )
+paepf                    f57d              (R )
+PF0                      000d              (R )
+PF1                      000e              (R )
+PF2                      000f              (R )
+player0x                 009e              (R )
+player0y                 009f              (R )
+player1x                 00e0              (R )
+player1y                 00e1              (R )
+PLAYFIELDINDEX           008e              (R )
+PLAYFIELDINDEXstep       008f              (R )
+PlayMusic                f52b              (R )
+pushabs                  f531                  
+pushabs2                 f535              (R )
+pushabstractextendedplayfield f558              (R )
+pushcondensedfield       f556                  
+pushlargeplayareaintosc  f230              (R )
+pushlargeplayareaintosc2 f23f              (R )
+pushlargeplayareaintosc3 f24e              (R )
+PushSprite0toCBSRAM      f3fb              (R )
+PushSprite1toCBSRAM      f408              (R )
+px                       0096                  
+py                       0097                  
+q                        00e7                  
+RAMplayfield             00a0              (R )
+ReadyPlayerOneBanner     f34b              (R )
+REFP0                    000b                  
+REFP1                    000c                  
+regs                     f239              (R )
+RESBL                    0014                  
+RESM0                    0012                  
+RESM1                    0013                  
+RESMP0                   0028                  
+RESMP1                   0029                  
+RESP0                    0010              (R )
+RESP1                    0011                  
+RSYNC                    0003                  
+savecycles               f34a              (R )
+savecycles2              f364              (R )
+scrollspeed              0094              (R )
+scrollspeedinit          0095              (R )
+setbitstatus             fbce                  
+skip01                   f42e              (R )
+skip010                  f49b              (R )
+skip011                  f4ae              (R )
+skip012                  f4b7              (R )
+skip013                  f4d2              (R )
+skip014                  f4db              (R )
+skip015                  f4e4              (R )
+skip016                  f4ed              (R )
+skip017                  f500              (R )
+skip018                  f509              (R )
+skip019                  f512              (R )
+skip02                   f437              (R )
+skip020                  f51b              (R )
+skip03                   f44a              (R )
+skip04                   f453              (R )
+skip05                   f464              (R )
+skip06                   f46d              (R )
+skip07                   f480              (R )
+skip08                   f489              (R )
+skip09                   f492              (R )
+skipnote                 f552              (R )
+skipplayer0horizontalsetup f2c8              (R )
+skipplayer0horizontalsetup2 f2d1              (R )
+skipplayer0horizontalsetup3 f2da              (R )
+skipplayer0horizontalsetup4 f2e3              (R )
+Sprite0SCR               f1f0              (R )
+Sprite0SCW               f0f0              (R )
+Sprite1SCR               f1f8              (R )
+Sprite1SCW               f0f8              (R )
+SPRITEDATA               f3b1              (R )
+StartOfFrame             f296              (R )
+stepovermtn              f326              (R )
+SUSTAINFORFRAMES         0081              (R )
+SWACNT                   0281                  
+SWBCNT                   0283                  
+SWCHA                    0280                  
+SWCHB                    0282                  
+T1024T                   0297                  
+TheMagicRoutine          f395              (R )
+TIA_BASE_ADDRESS         0000              (R )
+TIA_BASE_READ_ADDRESS    0000              (R )
+TIA_BASE_WRITE_ADDRESS   0000              (R )
+TIM1T                    0294                  
+TIM64T                   0296              (R )
+TIM8T                    0295                  
+TIMINT                   0285                  
+VBLANK                   0001              (R )
+VDELBL                   0027                  
+VDELP0                   0025                  
+VDELP1                   0026                  
+VERSION_VCS              0069                  
+VSYNC                    0000              (R )
+w16                      f9d3              (R )
+w17                      fa17              (R )
+waitnextnote             f576              (R )
+WSYNC                    0002              (R )
+xoffsetbitindex          f570              (R )
+xoffsetdone1             f57d              (R )
+xoffsetdone_getbitstatus fa48              (R )
+xoffsetgetbitstatus      fa3d              (R )
+y_flat                   fa5e              (R )
+YIndex                   008d                  
+--- End of Symbol List.

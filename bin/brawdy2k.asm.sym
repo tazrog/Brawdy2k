@@ -1,45 +1,45 @@
 --- Symbol List (sorted by symbol)
-0.AddHP                  f10b              (R )
-0.CollisionP0            f2c1              (R )
-0.CollisionPF            f292              (R )
-0.EndCollisionCheck      f321              (R )
-0.Enemyadd               f12b              (R )
-0.EnemyHit               f2f0              (R )
+0.AddHP                  f90b              (R )
+0.CollisionP0            fac1              (R )
+0.CollisionPF            fa92              (R )
+0.EndCollisionCheck      fb21              (R )
+0.Enemyadd               f92b              (R )
+0.EnemyHit               faf0              (R )
 0.FREE_BYTES             0000                  
-0.GameoverScreen         f14e              (R )
-0.InSprite0              f259              (R )
-0.InSprite1              f231              (R )
-0.MissileCol             f289                  
-0.P1P0Collision          f283                  
-0.P1PFCollision          f27d                  
-0.ScoreCOLUBK            f18c              (R )
-0.ScoreDigitLoop         f192              (R )
-0.SetFrame               f31d              (R )
-0.SkipAnim               f132              (R )
-0.Sprite0Scan            f24f                  
-0.Sprite1Scan            f227                  
-1.CLEAR_STACK            f006              (R )
+0.GameoverScreen         f94e              (R )
+0.InSprite0              fa59              (R )
+0.InSprite1              fa31              (R )
+0.MissileCol             fa89                  
+0.P1P0Collision          fa83                  
+0.P1PFCollision          fa7d                  
+0.ScoreCOLUBK            f98c              (R )
+0.ScoreDigitLoop         f992              (R )
+0.SetFrame               fb1d              (R )
+0.SkipAnim               f932              (R )
+0.Sprite0Scan            fa4f                  
+0.Sprite1Scan            fa27                  
+1.CLEAR_STACK            f806              (R )
 2.cycles                 0aef              (R )
 2.lines                  0025              (R )
-3.waittimer              f157              (R )
-5.Drop                   f368              (R )
-5.Left                   f3c2              (R )
-5.Move                   f396              (R )
-5.MoveLeft               f3b8              (R )
-5.MoveRight              f3a0                  
-5.Right                  f3a8              (R )
-5.SkipAllMoves           f3d1                  
-5.SkipDrop               f395                  
-5.Slow                   f391              (R )
-7.DivideLoop             f3e9              (R )
-8.FireButton             f40a                  
-8.MissileinAir           f402              (R )
-8.MoveJoystick           f42c              (R )
-8.SkipMoveLeft           f43f              (R )
-8.SkipMoveRight          f452              (R )
-_Resume1                 f273              (R )
+3.waittimer              f957              (R )
+5.Drop                   fb68              (R )
+5.Left                   fbc2              (R )
+5.Move                   fb96              (R )
+5.MoveLeft               fbb8              (R )
+5.MoveRight              fba0                  
+5.Right                  fba8              (R )
+5.SkipAllMoves           fbd1                  
+5.SkipDrop               fb95                  
+5.Slow                   fb91              (R )
+7.DivideLoop             fbe9              (R )
+8.FireButton             fc0a                  
+8.MissileinAir           fc02              (R )
+8.MoveJoystick           fc2c              (R )
+8.SkipMoveLeft           fc3f              (R )
+8.SkipMoveRight          fc52              (R )
+_Resume1                 fa73              (R )
 _Variables               0080                  
-_VSYNC                   f09b                  
+_VSYNC                   f89b                  
 AddHP                    00ab              (R )
 AnimCounter              0093              (R )
 AUDC0                    0015              (R )
@@ -49,14 +49,14 @@ AUDF1                    0018              (R )
 AUDV0                    0019              (R )
 AUDV1                    001a              (R )
 BackgroundClr            00a2              (R )
-CalculateDigitOffset     f4a0              (R )
+CalculateDigitOffset     fca0              (R )
 Center                   00a8              (R )
 CenterLevel              00a9              (R )
 COLUBK                   0009              (R )
 COLUP0                   0006              (R )
 COLUP1                   0007              (R )
 COLUPF                   0008              (R )
-Combat                   f27d                  
+Combat                   fa7d                  
 CTRLPF                   000a              (R )
 CXBLPF                   0006                  
 CXCLR                    002c              (R )
@@ -68,40 +68,40 @@ CXP0FB                   0002
 CXP1FB                   0003              (R )
 CXPPMM                   0007              (R )
 DamageClrPtr             0090              (R )
-DataPF2                  f58b              (R )
-DateColorPF0             f603              (R )
+DataPF2                  fd8b              (R )
+DateColorPF0             fe03              (R )
 Delay                    00b4              (R )
 DestroyAnim              0092              (R )
-Digits                   f61f              (R )
+Digits                   fe1f              (R )
 DIGITS_HEIGHT            0005              (R )
 EFFECT1                  00ac              (R )
 EFFECT2                  00af              (R )
 ENABL                    001f                  
 ENAM0                    001d              (R )
 ENAM1                    001e                  
-EndSoundEffects          f21a              (R )
-EnemyAnim                f11e              (R )
+EndSoundEffects          fa1a              (R )
+EnemyAnim                f91e              (R )
 EnemyAnimOffset          0094              (R )
 EnemyColorPtr            008a              (R )
 EnemyCount               00a3              (R )
-EnemyDrop                f362              (R )
+EnemyDrop                fb62              (R )
 EnemyDropLevel           00a6              (R )
-EnemySprite              f227                  
+EnemySprite              fa27                  
 EnemySpritePtr           0088              (R )
 EnemyXLoc                0084              (R )
 Exp                      00aa                  
 ExpOff                   00b0              (R )
-ExpSound                 f0ac                  
-ExpSoundOff              f0ce              (R )
-FireMissileMacro         f23f                  
-FireSoundCheck           f1f7                  
+ExpSound                 f8ac                  
+ExpSoundOff              f8ce              (R )
+FireMissileMacro         fa3f                  
+FireSoundCheck           f9f7                  
 Gameover                 00a1                  
-GameOver                 f4c1              (R )
-GameScreen               f21a                  
-GameSettings             f0d6              (R )
-GetRandomCenter          f487              (R )
-GetRandomLevel           f46e              (R )
-GetRandomPos             f455              (R )
+GameOver                 fcc1              (R )
+GameScreen               fa1a                  
+GameSettings             f8d6              (R )
+GetRandomCenter          fc87              (R )
+GetRandomLevel           fc6e              (R )
+GetRandomPos             fc55              (R )
 GRP0                     001b              (R )
 GRP1                     001c              (R )
 HMBL                     0024                  
@@ -119,75 +119,75 @@ INPT3                    000b
 INPT4                    000c              (R )
 INPT5                    000d                  
 INTIM                    0284              (R )
-Joystick                 f3f8              (R )
+Joystick                 fbf8              (R )
 Level                    00a7              (R )
-MakeExpSound             f0b6                  
+MakeExpSound             f8b6                  
 Missile0x                0096              (R )
 Missile0y                0097              (R )
-Movement                 f396                  
+Movement                 fb96                  
 MUSIC1                   00ae                  
-NewStart1                f0da                  
-NewStart2                f26a                  
-NoSound                  f212              (R )
+NewStart1                f8da                  
+NewStart2                fa6a                  
+NoSound                  fa12              (R )
 NUSIZ0                   0004              (R )
 NUSIZ1                   0005              (R )
-OffScreen                f3d2              (R )
+OffScreen                fbd2              (R )
 OnesDigitOffset          0098              (R )
 P0AnimOffset             00a4              (R )
-P0ColorFrame0            f531              (R )
-P0ColorFrame1            f53a                  
-P0ColorFrame2            f543                  
-P0ColorFrame4            f54c                  
+P0ColorFrame0            fd31              (R )
+P0ColorFrame1            fd3a                  
+P0ColorFrame2            fd43                  
+P0ColorFrame4            fd4c                  
 P0ColorPtr               008e              (R )
-P0Frame0                 f516              (R )
-P0Frame1                 f51f                  
-P0Frame2                 f528                  
-P0Sprite                 f24f                  
+P0Frame0                 fd16              (R )
+P0Frame1                 fd1f                  
+P0Frame2                 fd28                  
+P0Sprite                 fa4f                  
 P0SPRITEHGT              0008              (R )
 P0SpritePtr              008c              (R )
-P1ColorFrame0            f570              (R )
-P1ColorFrame1            f579                  
-P1ColorFrame2            f582                  
-P1Frame0                 f555              (R )
-P1Frame1                 f55e                  
-P1Frame2                 f567                  
+P1ColorFrame0            fd70              (R )
+P1ColorFrame1            fd79                  
+P1ColorFrame2            fd82                  
+P1Frame0                 fd55              (R )
+P1Frame1                 fd5e                  
+P1Frame2                 fd67                  
 P1SPRITEHGT              0008              (R )
 Pause                    00b1              (R )
 PF0                      000d              (R )
 PF1                      000e              (R )
 PF2                      000f              (R )
-Player0                  f516                  
+Player0                  fd16                  
 Player0x                 0081              (R )
 Player0y                 0080              (R )
 Player1x                 0083              (R )
 Player1y                 0082              (R )
-PlayField                f21c              (R )
-Pointers                 f068                  
+PlayField                fa1c              (R )
+Pointers                 f868                  
 rand16                   0086                  
 Random                   0085              (R )
 REFP0                    000b                  
 REFP1                    000c                  
 RESBL                    0014                  
-Reset                    f000              (R )
+Reset                    f800              (R )
 RESM0                    0012                  
 RESM1                    0013                  
 RESMP0                   0028                  
 RESMP1                   0029                  
 RESP0                    0010              (R )
 RESP1                    0011                  
-Resume1                  f0e3              (R )
+Resume1                  f8e3              (R )
 RSYNC                    0003                  
 Score                    009c              (R )
-Scoreboard               f162                  
-ScoreLoop                f4a2              (R )
+Scoreboard               f962                  
+ScoreLoop                fca2              (R )
 ScoreSprite              009f              (R )
-SetHorizPos              f3e6              (R )
-SetScreen                f1db                  
-SetVar                   f029              (R )
-SkipMissile              f24d              (R )
-Sleep12Cycles            f4c0              (R )
+SetHorizPos              fbe6              (R )
+SetScreen                f9db                  
+SetVar                   f829              (R )
+SkipMissile              fa4d              (R )
+Sleep12Cycles            fcc0              (R )
 SoundOff                 00ad              (R )
-Start                    f090              (R )
+Start                    f890              (R )
 Stop                     00b2              (R )
 StopMove                 00b3                  
 SWACNT                   0281                  
@@ -205,8 +205,8 @@ TIM64T                   0296              (R )
 TIM8T                    0295                  
 TimerSprite              00a0              (R )
 TIMINT                   0285                  
-Unpause                  f01b              (R )
-Vblank                   f323                  
+Unpause                  f81b              (R )
+Vblank                   fb23                  
 VBLANK                   0001              (R )
 VDELBL                   0027                  
 VDELP0                   0025                  

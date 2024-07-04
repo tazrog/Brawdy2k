@@ -87,7 +87,7 @@ SkipMissile:
 ;; Start our ROM code segment for 2k game at $F800
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;    
     seg Code
-    org $F000
+    org $F800
 Reset:
     CLEAN_START
     lda #$CA
@@ -175,7 +175,8 @@ Start:
     bcc Unpause    
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 _VSYNC:
-    REPEAT 3  
+    REPEAT 3
+    sta WSYNC  
     REPEND
     lda #0
     sta VSYNC  
@@ -253,7 +254,7 @@ EnemyAnim:
     lda EnemyAnimOffset
     cmp DestroyAnim
     bcc .Enemyadd    
-EnemyXLoc       .byte
+    lda #0
     sta EnemyAnimOffset
     jmp .SkipAnim
 .Enemyadd:
@@ -276,13 +277,13 @@ EnemyXLoc       .byte
     jsr SetHorizPos
 .GameoverScreen
     jsr CalculateDigitOffset
-Random          .byte
+    sta WSYNC
     sta HMOVE
     sta WSYNC    
 
     TIMER_WAIT
     lda #0
-rand16          .word
+    sta VBLANK
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Display the scoreboard lines
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
